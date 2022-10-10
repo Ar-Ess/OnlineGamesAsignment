@@ -12,6 +12,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float speed = 6000;
     [SerializeField] float acceleration = 1;
     [SerializeField] float jumpForce = 5000;
+    [SerializeField] float globalGravity = 10;
+
+    float gravityScale = 10;
+    float fallingGravityScale = 40;
+    bool ground = false;
 
 
     Rigidbody rb;
@@ -24,19 +29,48 @@ public class PlayerMovement : MonoBehaviour
         transform.position = spawnpoint.position;
         rb = GetComponent<Rigidbody>();
         Physics.gravity = new Vector3(0, -200, 0);
+        rb.useGravity = false;
+        ground = false;
+    }
+
+    private void FixedUpdate()
+    {
+        camera.transform.position = new Vector3(transform.position.x, transform.position.y + 33, -36);
+
+        Vector3 gravity = -globalGravity * gravityScale * Vector3.up;
+        rb.AddForce(gravity, ForceMode.Acceleration);
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
+
+
         float acc = 1;
         if (Input.GetKey(KeyCode.LeftShift)) acc = acceleration;
 
         if (Input.GetKey(KeyCode.A)) rb.AddForce(new Vector3(-speed * Time.deltaTime * acc, 0, 0));
 
-        if (Input.GetKey(KeyCode.D)) rb.AddForce(new Vector3( speed * Time.deltaTime * acc, 0, 0));
+        if (Input.GetKey(KeyCode.D)) rb.AddForce(new Vector3(speed * Time.deltaTime * acc, 0, 0));
 
-        if (Input.GetKeyDown(KeyCode.W)) rb.AddForce(new Vector3(0, jumpForce * Time.deltaTime, 0), ForceMode.Impulse);
+        if (ground && Input.GetKeyDown(KeyCode.Space)) Jump();
+    }
 
+    void OnCollisionEnter(Collision hit)
+    {
+        if (hit.gameObject.CompareTag("Ground"))
+        {
+            ground = true;
+        }
+    }
+
+    void OnCollisionExit(Collision hit)
+    {
+        ground = false;
+    }
+
+    private void Jump()
+    {
+        rb.AddForce(Vector2.up * jumpForce, ForceMode.Acceleration);
     }
 }
