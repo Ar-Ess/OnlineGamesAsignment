@@ -23,7 +23,8 @@ public class UDPClient : MonoBehaviour
     public void SendData()
     {
         byte[] buffer = new byte[1024];
-        endPoint = new IPEndPoint(IPAddress.Loopback, 5554);
+        endPoint = new IPEndPoint(IPAddress.Parse("0.0.0.1"), 5554);
+        Debug.Log(endPoint.ToString());
         clientSocket.BeginSendTo(buffer, 0, buffer.Length, SocketFlags.None, endPoint, new AsyncCallback(Send), clientSocket);
     }
 
@@ -37,8 +38,8 @@ public class UDPClient : MonoBehaviour
 
     private void Recieve(IAsyncResult AR)
     {
-        connected = true;
         clientSocket.EndReceive(AR);
+        connected = true;
         SendData();
     }
 
