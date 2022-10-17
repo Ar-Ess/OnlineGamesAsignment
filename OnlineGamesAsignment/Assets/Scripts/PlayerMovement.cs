@@ -15,13 +15,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float globalGravity = 10;
 
     float gravityScale = 10;
-    float fallingGravityScale = 40;
     bool ground = false;
-
 
     Rigidbody rb;
 
-    // Start is called before the first frame update
     void Start()
     {
         camera.transform.position = new Vector3(0, 33, -36);
@@ -41,10 +38,8 @@ public class PlayerMovement : MonoBehaviour
         rb.AddForce(gravity, ForceMode.Acceleration);
     }
 
-    // Update is called once per frame
     void Update()
     {
-
 
         float acc = 1;
         if (Input.GetKey(KeyCode.LeftShift)) acc = acceleration;
@@ -53,7 +48,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKey(KeyCode.D)) rb.AddForce(new Vector3(speed * Time.deltaTime * acc, 0, 0));
 
-        if (ground && Input.GetKeyDown(KeyCode.Space)) Jump();
+        if (Input.GetKeyDown(KeyCode.Space)) Jump();
     }
 
     void OnCollisionEnter(Collision hit)
@@ -64,13 +59,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void OnCollisionExit(Collision hit)
-    {
-        ground = false;
-    }
-
     private void Jump()
     {
         rb.AddForce(Vector2.up * jumpForce, ForceMode.Acceleration);
+        ground = false;
     }
 }
