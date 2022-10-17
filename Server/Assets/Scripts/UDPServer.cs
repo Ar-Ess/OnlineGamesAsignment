@@ -11,7 +11,7 @@ using System;
 public class UDPServer : MonoBehaviour
 {
     private static List<Socket> clientSockets = new List<Socket>();
-    private Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Udp);
+    private Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
     private static byte[] buffer = new byte[1024];
     EndPoint eP;
 
@@ -23,7 +23,8 @@ public class UDPServer : MonoBehaviour
     private void SetupServer()
     {
         Debug.Log("Setting up server...");
-        IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 5555);
+        IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 5554);
+        Debug.Log(endPoint.ToString());
         eP = endPoint;
 
         serverSocket.Bind(endPoint);
