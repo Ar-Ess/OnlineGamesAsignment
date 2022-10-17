@@ -13,6 +13,7 @@ public class UDPServer : MonoBehaviour
     private static List<Socket> clientSockets = new List<Socket>();
     private Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Udp);
     private static byte[] buffer = new byte[1024];
+    EndPoint eP;
 
     void Start()
     {
@@ -22,28 +23,20 @@ public class UDPServer : MonoBehaviour
     private void SetupServer()
     {
         Debug.Log("Setting up server...");
-        serverSocket.Bind(new IPEndPoint(IPAddress.Any, 5555));
-        serverSocket.Listen(1);
-        serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
+        IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 5555);
+        eP = endPoint;
+
+        serverSocket.Bind(endPoint);
+        serverSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref eP, new AsyncCallback(ProcessDatagram), null);
     }
 
-    private void AcceptCallback(IAsyncResult AR)
+    private void ProcessDatagram(IAsyncResult AR)
     {
-        Socket socket = serverSocket.EndAccept(AR);
-        clientSockets.Add(socket);
-        Debug.Log("Client Connected!");
-        socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
-        serverSocket.BeginAccept(new AsyncCallback(ReceiveCallback), null);
-    }
-
-    private void ReceiveCallback(IAsyncResult AR)
-    {
-        Socket socket = (Socket)AR.AsyncState;
-        int receivedData = socket.EndReceive(AR);
+        int receivedData = serverSocket.EndReceive(AR);
         byte[] tempBuff = new byte[receivedData];
         Array.Copy(buffer, tempBuff, receivedData);
 
-        string text = Encoding.ASCII.GetString(tempBuff);
+        string text = Encoding.ASCII.GetString(buffer);
         string response = string.Empty;
         Debug.Log("Text Received: " + text);
 
@@ -57,12 +50,13 @@ public class UDPServer : MonoBehaviour
         }
 
         byte[] data = Encoding.ASCII.GetBytes(response);
-        socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(SendCallback), null);
-        socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
+
+        serverSocket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(SendCallback), null);
+        serverSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref eP, new AsyncCallback(ProcessDatagram), null);
     }
 
 
-    private static void SendCallback(IAsyncResult AR)
+    private void SendCallback(IAsyncResult AR)
     {
         Socket socket = (Socket)AR.AsyncState;
         socket.EndSend(AR);

@@ -11,13 +11,8 @@ using UnityEngine.SceneManagement;
 
 public class UDPClient : MonoBehaviour
 {
-    private static Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+    private static Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Udp);
     bool connected = false;
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
 
     public void LoopConnect()
     {
