@@ -547,9 +547,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1347498878}
-        m_TargetAssemblyTypeName: TCPClient, Assembly-CSharp
-        m_MethodName: LoopConnect
+      - m_Target: {fileID: 1480940169}
+        m_TargetAssemblyTypeName: TCPServer, Assembly-CSharp
+        m_MethodName: SetupServer
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -597,7 +597,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 445363106}
   m_CullTransparentMesh: 1
---- !u!1 &1347498877
+--- !u!1 &1480940168
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -605,34 +605,34 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1347498879}
-  - component: {fileID: 1347498878}
+  - component: {fileID: 1480940170}
+  - component: {fileID: 1480940169}
   m_Layer: 0
-  m_Name: Client
+  m_Name: Server
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1347498878
+--- !u!114 &1480940169
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1347498877}
+  m_GameObject: {fileID: 1480940168}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b4d89dd68002b1e4a89b2e4dfd544e15, type: 3}
+  m_Script: {fileID: 11500000, guid: ad8f2f87628ea2c42a1cb23ddcfac2c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &1347498879
+--- !u!4 &1480940170
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1347498877}
+  m_GameObject: {fileID: 1480940168}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -710,7 +710,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Connect
+  m_Text: Create game
 --- !u!222 &1503736543
 CanvasRenderer:
   m_ObjectHideFlags: 0
