@@ -1,22 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using System.Linq;
 using System;
 using UnityEngine.SceneManagement;
+using System.Net;
 
 public class UDPClient : MonoBehaviour
 {
-    private static Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Udp);
+    private static Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
     bool connected = false;
+    IPEndPoint endPoint;
 
     private void Start()
     {
-        SendDeita();
+        SendData();
     }
 
     void Update()
@@ -24,24 +20,26 @@ public class UDPClient : MonoBehaviour
         if (connected) ChangeScene();
        
     }
-
-    private void SendDeita()
+    public void SendData()
     {
         byte[] buffer = new byte[1024];
-        clientSocket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(Sen), clientSocket);
-    }
-    private void Sen(IAsyncResult AR)
-    {
-        clientSocket.EndSend(AR);
-        byte[] buffer = new byte[1024];
-        clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(Resif), clientSocket);
+        endPoint = new IPEndPoint(IPAddress.Loopback, 5554);
+        clientSocket.BeginSendTo(buffer, 0, buffer.Length, SocketFlags.None, endPoint, new AsyncCallback(Send), clientSocket);
     }
 
-    private void Resif(IAsyncResult AR)
+    private void Send(IAsyncResult AR)
     {
+        clientSocket.EndSendTo(AR);
+        byte[] buffer = new byte[1024];
+        EndPoint eP = endPoint;
+        clientSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref eP, new AsyncCallback(Recieve), clientSocket);
+    }
+
+    private void Recieve(IAsyncResult AR)
+    {
+        connected = true;
         clientSocket.EndReceive(AR);
-        byte[] buffer = new byte[1024];
-        clientSocket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(Sen), clientSocket);
+        SendData();
     }
 
     private void ChangeScene()

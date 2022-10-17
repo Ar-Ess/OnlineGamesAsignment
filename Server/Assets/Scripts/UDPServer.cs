@@ -17,20 +17,20 @@ public class UDPServer : MonoBehaviour
 
     void Start()
     {
-        SetapServer();
+        SetupServer();
     }
 
-    private void SetapServer()
+    private void SetupServer()
     {
         Debug.Log("Setting up server...");
         IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 5555);
         eP = endPoint;
 
         serverSocket.Bind(endPoint);
-        serverSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref eP, new AsyncCallback(ProcesDeitagram), null);
+        serverSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref eP, new AsyncCallback(ProcessDatagram), null);
     }
 
-    private void ProcesDeitagram(IAsyncResult AR)
+    private void ProcessDatagram(IAsyncResult AR)
     {
         Debug.Log("message resifd");
         int receivedData = serverSocket.EndReceive(AR);
@@ -52,12 +52,12 @@ public class UDPServer : MonoBehaviour
 
         byte[] data = Encoding.ASCII.GetBytes(response);
 
-        serverSocket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(SenColbac), null);
-        serverSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref eP, new AsyncCallback(ProcesDeitagram), AR.AsyncState);
+        serverSocket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(SendCallback), null);
+        serverSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref eP, new AsyncCallback(ProcessDatagram), AR.AsyncState);
     }
 
 
-    private void SenColbac(IAsyncResult AR)
+    private void SendCallback(IAsyncResult AR)
     {
         Socket socket = (Socket)AR.AsyncState;
         socket.EndSend(AR);
