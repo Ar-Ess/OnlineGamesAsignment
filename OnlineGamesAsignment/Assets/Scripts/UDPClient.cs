@@ -14,33 +14,34 @@ public class UDPClient : MonoBehaviour
     private static Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Udp);
     bool connected = false;
 
-    public void LoopConnect()
+    private void Start()
     {
-        int attempts = 0;
-        while(!clientSocket.Connected)
-        {
-            try
-            {
-                attempts++;
-                clientSocket.Connect(IPAddress.Loopback, 5555);
-                connected = true;
-            }
-            catch (SocketException)
-            {
-                Debug.Log("Connection attempts: " + attempts.ToString());
-            }
-        }
-
-        Debug.ClearDeveloperConsole();
-        Debug.Log("Connected!");
-
+        SendDeita();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (connected) ChangeScene();
        
+    }
+
+    private void SendDeita()
+    {
+        byte[] buffer = new byte[1024];
+        clientSocket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(Sen), clientSocket);
+    }
+    private void Sen(IAsyncResult AR)
+    {
+        clientSocket.EndSend(AR);
+        byte[] buffer = new byte[1024];
+        clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(Resif), clientSocket);
+    }
+
+    private void Resif(IAsyncResult AR)
+    {
+        clientSocket.EndReceive(AR);
+        byte[] buffer = new byte[1024];
+        clientSocket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(Sen), clientSocket);
     }
 
     private void ChangeScene()
