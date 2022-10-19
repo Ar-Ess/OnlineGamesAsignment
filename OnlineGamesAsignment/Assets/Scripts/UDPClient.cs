@@ -22,29 +22,21 @@ public class UDPClient : MonoBehaviour
     }
     public void SendData()
     {
-        byte[] buffer = new byte[1024];
-        endPoint = new IPEndPoint(IPAddress.Parse("0.0.0.1"), 5554);
-        Debug.Log(endPoint.ToString());
-        clientSocket.BeginSendTo(buffer, 0, buffer.Length, SocketFlags.None, endPoint, new AsyncCallback(Send), clientSocket);
-    }
+        UdpClient client = new UdpClient();
+        IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.25"), 5554);
+        client.Connect(ep);
 
-    private void Send(IAsyncResult AR)
-    {
-        clientSocket.EndSendTo(AR);
-        byte[] buffer = new byte[1024];
-        EndPoint eP = endPoint;
-        clientSocket.BeginReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref eP, new AsyncCallback(Recieve), clientSocket);
-    }
+        client.Send(new byte[] { 1, 2, 3, 4, 5 }, 5);
+        var receivedData = client.Receive(ref ep);
+        Debug.Log("received data from" + ep.ToString());
 
-    private void Recieve(IAsyncResult AR)
-    {
-        clientSocket.EndReceive(AR);
-        connected = true;
-        SendData();
+        connected = true; ;
     }
 
     private void ChangeScene()
     {
         SceneManager.LoadScene(1);
     }
+
+    
 }
