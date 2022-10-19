@@ -17,7 +17,7 @@ public class UDPServer : MonoBehaviour
 
     private void Start()
     {
-        SetupServer();
+
     }
 
     public void SetupServer()

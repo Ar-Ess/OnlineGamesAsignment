@@ -12,7 +12,7 @@ public class UDPClient : MonoBehaviour
 
     private void Start()
     {
-        SendData();
+        
     }
 
     void Update()
@@ -23,7 +23,7 @@ public class UDPClient : MonoBehaviour
     public void SendData()
     {
         UdpClient client = new UdpClient();
-        IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.2.25"), 5554);
+        IPEndPoint ep = new IPEndPoint(IPAddress.Parse("192.168.1.189"), 5554);
         client.Connect(ep);
 
         client.Send(new byte[] { 1, 2, 3, 4, 5 }, 5);
