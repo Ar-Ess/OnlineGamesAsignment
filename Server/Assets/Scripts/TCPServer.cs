@@ -14,23 +14,13 @@ public class TCPServer : MonoBehaviour
     private static List<Socket> clientSockets = new List<Socket>();
     private Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     private static byte[] buffer = new byte[1024];
-    // Start is called before the first frame update
-    void Start()
-    {
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void SetupServer()
     {
         Debug.Log("Setting up server...");
         serverSocket.Bind(new IPEndPoint(IPAddress.Any, 5555));
-        serverSocket.Listen(1);
+        serverSocket.Listen(2);
         serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
         SceneManager.LoadScene(1);
 
@@ -43,6 +33,7 @@ public class TCPServer : MonoBehaviour
         Debug.Log("Client Connected!");
         socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
         serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
+        Debug.Log(" Welcome to NoNameServer!");
     }
 
     private static void ReceiveCallback(IAsyncResult AR)

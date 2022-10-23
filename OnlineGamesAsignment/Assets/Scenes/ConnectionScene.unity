@@ -317,7 +317,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: UDP Client connect
+  m_Text: Join UDP Game
 --- !u!222 &243082275
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -805,7 +805,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 107057840}
         m_TargetAssemblyTypeName: TCPClient, Assembly-CSharp
-        m_MethodName: LoopConnect
+        m_MethodName: StartConnection
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -923,7 +923,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: TCP Client connect
+  m_Text: Join TCP Game
 --- !u!222 &1503736543
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1044,6 +1044,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 922e65cbf2b833c42ae76be67a73496d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serverIP: 192.168.1.189
 --- !u!4 &1824764954
 Transform:
   m_ObjectHideFlags: 0

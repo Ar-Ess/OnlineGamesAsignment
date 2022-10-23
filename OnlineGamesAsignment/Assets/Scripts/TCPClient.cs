@@ -13,39 +13,44 @@ public class TCPClient : MonoBehaviour
 {
     private static Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     bool connected = false;
-    // Start is called before the first frame update
-    void Start()
-    {
+    bool connecting = false;
+    int attempts = 0; 
 
+    private void Update()
+    {
+        
+        if (connecting)
+        {
+            Debug.Log("trying to connect");
+            LoopConnect();
+            Debug.Log("connected");
+        }      
+        
     }
 
     public void LoopConnect()
     {
-        int attempts = 0;
-        while(!clientSocket.Connected)
+        attempts++;
+
+        try
         {
-            try
-            {
-                attempts++;
-                clientSocket.Connect(IPAddress.Loopback, 5555);
-                connected = true;
-            }
-            catch (SocketException)
-            {
-                Debug.Log("Connection attempts: " + attempts.ToString());
-            }
+            clientSocket.Connect(IPAddress.Loopback, 5555);
+            connecting = false;
+            Debug.Log("Connected!");
+            attempts = 0;
+            ChangeScene();
+        }
+        catch (SocketException)
+        {
+                Debug.LogError("Connection attempts: " + attempts.ToString());
         }
 
-        Debug.ClearDeveloperConsole();
-        Debug.Log("Connected!");
 
     }
 
-    // Update is called once per frame
-    void Update()
+    public void StartConnection()
     {
-        if (connected) ChangeScene();
-       
+        connecting = true;
     }
 
     private void ChangeScene()
