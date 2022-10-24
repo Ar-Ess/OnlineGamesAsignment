@@ -1,11 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
-using System.Linq;
 using System;
 using UnityEngine.SceneManagement;
 
@@ -14,15 +11,32 @@ public class TCPServer : MonoBehaviour
     private static List<Socket> clientSockets = new List<Socket>();
     private Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     private static byte[] buffer = new byte[1024];
+    private TCPServer _instance;
+    public TCPServer Instance { get { return _instance; } }
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+
+        else _instance = this;
+
+        DontDestroyOnLoad(this);
+        
+    }
 
 
     public void SetupServer()
     {
-        Debug.Log("Setting up server...");
+        Debug.Log("Setting up tcp server...");
         serverSocket.Bind(new IPEndPoint(IPAddress.Any, 5555));
+        ChangeScene();
+
+        Debug.Log("Waiting for client...");
         serverSocket.Listen(2);
         serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
-        SceneManager.LoadScene(1);
 
     }
 
@@ -66,5 +80,22 @@ public class TCPServer : MonoBehaviour
     {
         Socket socket = (Socket)AR.AsyncState;
         socket.EndSend(AR);
+    }
+
+    private void OnApplicationQuit()
+    {
+        if (serverSocket.Connected) serverSocket.Disconnect(false);
+        serverSocket.Close();
+        foreach(Socket socket in clientSockets)
+        {
+            if (socket.Connected) socket.Disconnect(false);
+            socket.Close();
+        }
+        clientSockets.Clear();
+    }
+
+    private void ChangeScene()
+    {
+        SceneManager.LoadScene(1);
     }
 }
