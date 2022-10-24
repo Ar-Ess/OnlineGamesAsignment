@@ -3,15 +3,17 @@ using System.Net.Sockets;
 using UnityEngine.SceneManagement;
 using System.Net;
 using System.Threading;
+using UnityEngine.UI;
 
 public class UDPClient : MonoBehaviour
 {
     private static Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
     EndPoint ep;
     bool connectToScene = false;
-    [SerializeField] private string serverIP;
+    private string serverIP;
     byte[] data = new byte[1024];
     Thread thr;
+    public InputField field;
 
     private UDPClient _instance;
     public UDPClient Instance { get { return _instance; } }
@@ -64,6 +66,12 @@ public class UDPClient : MonoBehaviour
     {
         SceneManager.LoadScene(1);
         connectToScene = false;
+    }
+
+    public void ChangeStringIP()
+    {
+        serverIP = field.text;
+        Debug.Log("ip: " + serverIP.ToString());
     }
 
     private void OnApplicationQuit()
