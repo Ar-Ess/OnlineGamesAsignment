@@ -756,7 +756,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1448313024}
         m_TargetAssemblyTypeName: UDPServer, Assembly-CSharp
         m_MethodName: SetupServer
         m_Mode: 1
