@@ -1,16 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
-public class MainMenuLogic : MonoBehaviour
+public static class SceneManagement
 {
-    public void ChangeScene(string scene)
+    static public void ChangeScene(string scene)
     {
-        Debug.Log(scene);
         switch (scene)
         {
             case "ClientConnectScene":
             case "ServerConnectScene":
+            case "MainMenuScene":
                 SceneManager.LoadScene(scene);
                 break;
         }
