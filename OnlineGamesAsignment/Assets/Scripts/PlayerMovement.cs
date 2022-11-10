@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -13,6 +14,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float acceleration = 1;
     [SerializeField] float jumpForce = 5000;
     [SerializeField] float globalGravity = 10;
+    [SerializeField] string state = string.Empty;
+    Serializer serializer = new Serializer();
+    public MemoryStream stream = new MemoryStream();
 
     float gravityScale = 10;
     bool ground = false;
@@ -44,11 +48,20 @@ public class PlayerMovement : MonoBehaviour
         float acc = 1;
         if (Input.GetKey(KeyCode.LeftShift)) acc = acceleration;
 
-        if (Input.GetKey(KeyCode.A)) rb.AddForce(new Vector3(-speed * Time.deltaTime * acc, 0, 0));
+        if (Input.GetKey(KeyCode.A))
+        {
+            rb.AddForce(new Vector3(-speed * Time.deltaTime * acc, 0, 0));
+            state = "Moving right";
+            
+            stream = serializer.Serialize(state);
+            
+        }
 
         if (Input.GetKey(KeyCode.D)) rb.AddForce(new Vector3(speed * Time.deltaTime * acc, 0, 0));
 
         if (Input.GetKeyDown(KeyCode.Space)) Jump();
+
+        serializer.Deserialize(recStream);
     }
 
     void OnCollisionEnter(Collision hit)

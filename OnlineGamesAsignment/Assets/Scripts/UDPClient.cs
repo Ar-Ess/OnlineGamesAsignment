@@ -14,6 +14,7 @@ public class UDPClient : MonoBehaviour
     byte[] data = new byte[1024];
     Thread thr;
     public InputField field;
+    PlayerMovement player;
 
     private UDPClient _instance;
     public UDPClient Instance { get { return _instance; } }
@@ -47,7 +48,7 @@ public class UDPClient : MonoBehaviour
             return;
         }
 
-
+        data = player.stream.ToArray();
         clientSocket.Send(data, data.Length, SocketFlags.None);
         clientSocket.ReceiveFrom(data, ref ep);
         Debug.Log("received data from" + ep.ToString());
