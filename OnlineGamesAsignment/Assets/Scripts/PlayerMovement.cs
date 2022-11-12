@@ -15,8 +15,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float speed = 50;
     [SerializeField] float acceleration = 1;
     [SerializeField] float jumpForce = 50;
-    [SerializeField] float globalGravity = 10;
-    [SerializeField] string state = string.Empty;
+
     Serializer serializer = new Serializer();
     public MemoryStream stream = new MemoryStream();
 
@@ -66,12 +65,6 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private void Jump() => rb.velocity = new Vector2(0, jumpForce);
-
-    //private bool IsGrounded()
-    //{
-    //    var groundCheck = Physics.Raycast(transform.position, Vector2.down, 0.7f);
-    //    return groundCheck.CompareTo != null && groundCheck.CompareTag("Ground");
-    //}
 
     private void OnCollisionStay(Collision collision)
     {
