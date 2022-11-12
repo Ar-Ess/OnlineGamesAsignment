@@ -8,6 +8,8 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] Camera camera;
     [SerializeField] Transform spawnpoint;
+    SpriteRenderer sprite;
+    Animator anim;
 
     [Header("Physics")]
     [SerializeField] float speed = 50;
@@ -26,6 +28,8 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        anim = GetComponent<Animator>();
+        sprite = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
@@ -38,6 +42,22 @@ public class PlayerMovement : MonoBehaviour
     {
         var horizontalInput = Input.GetAxisRaw("Horizontal");
         rb.velocity = new Vector2(horizontalInput * speed, rb.velocity.y);
+        if (rb.velocity.x > 0)
+        {
+            sprite.flipX = false;
+            anim.SetInteger("Animation", 1);
+        }
+  
+        else if (rb.velocity.x < 0)
+        {
+            sprite.flipX = true;
+            anim.SetInteger("Animation", 1);
+        }
+        
+        else if(rb.velocity.x == 0)
+        {
+            anim.SetInteger("Animation", 0);
+        }
     }
 
     private void Jump() => rb.velocity = new Vector2(0, jumpForce);
