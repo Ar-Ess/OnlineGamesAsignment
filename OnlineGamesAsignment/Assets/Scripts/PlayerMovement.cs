@@ -42,21 +42,26 @@ public class PlayerMovement : MonoBehaviour
     {
         var horizontalInput = Input.GetAxisRaw("Horizontal");
         rb.velocity = new Vector2(horizontalInput * speed, rb.velocity.y);
-        if (rb.velocity.x > 0)
+        if (rb.velocity.x > 0 && rb.velocity.y <= 0.1 && ground)
         {
             sprite.flipX = false;
             anim.SetInteger("Animation", 1);
         }
   
-        else if (rb.velocity.x < 0)
+        else if (rb.velocity.x < 0 && rb.velocity.y <= 0.1 && ground)
         {
             sprite.flipX = true;
             anim.SetInteger("Animation", 1);
         }
         
-        else if(rb.velocity.x == 0)
+        else if(rb.velocity.x == 0 )
         {
             anim.SetInteger("Animation", 0);
+        }
+
+        else if(rb.velocity.y > 0 && !ground)
+        {
+            anim.SetInteger("Animation", 2);
         }
     }
 
