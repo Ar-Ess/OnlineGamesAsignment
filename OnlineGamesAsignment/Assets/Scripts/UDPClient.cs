@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using System.Net;
 using System.Threading;
 using UnityEngine.UI;
+using System.Text;
 
 public class UDPClient : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class UDPClient : MonoBehaviour
     EndPoint ep;
     bool connectToScene = false;
     private string serverIP;
+    string stringData = "Hello";
     byte[] data = new byte[1024];
     Thread thr;
     public InputField field;
@@ -48,12 +50,14 @@ public class UDPClient : MonoBehaviour
             return;
         }
 
-        data = player.stream.ToArray();
+        connectToScene = true;
+
+        data = Encoding.ASCII.GetBytes(stringData);
         clientSocket.Send(data, data.Length, SocketFlags.None);
         clientSocket.ReceiveFrom(data, ref ep);
         Debug.Log("received data from" + ep.ToString());
 
-        connectToScene = true;
+        
     }
 
     public void JoinServer()

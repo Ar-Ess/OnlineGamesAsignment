@@ -14,6 +14,7 @@ public class UDPServer : MonoBehaviour
     EndPoint remote;
     Thread thr;
     [SerializeField] int maxPlayers;
+    string stringData = string.Empty;
 
     private UDPServer _instance;
     public UDPServer Instance { get { return _instance; } }
@@ -52,10 +53,12 @@ public class UDPServer : MonoBehaviour
             Debug.Log(clientSocket.Address);
             remote = clientSocket;
             serverSocket.ReceiveFrom(data, ref remote);
+            stringData = Encoding.ASCII.GetString(data);
 
             numPlayers++;
 
             Debug.Log("Message received from {0}: " + remote.ToString());
+            Debug.Log("Message: " + stringData);
             Debug.Log("Welcome to NoNameServer!");
 
             string welcome = "Welcome to my test server";

@@ -1081,8 +1081,6 @@ MonoBehaviour:
   speed: 5
   acceleration: 1
   jumpForce: 5
-  globalGravity: 10
-  state: 
 --- !u!54 &1302787309
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1453,7 +1451,7 @@ Animator:
   m_GameObject: {fileID: 1783372996}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 4e8688c23c3b9884fb8a58f5760e1395, type: 2}
+  m_Controller: {fileID: 9100000, guid: cd79d95f33438994c8ca523897217c0d, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1489,8 +1487,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.18629268, y: 0.34385622, z: 0.007297115}
-  m_Center: {x: -0.05121196, y: -0.04807194, z: 0.0023695312}
+  m_Size: {x: 0.19145615, y: 0.2786284, z: 0.0072971154}
+  m_Center: {x: -0.013559553, y: -0.04178192, z: 0.0023695307}
 --- !u!114 &1783373000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1508,8 +1506,6 @@ MonoBehaviour:
   speed: 5
   acceleration: 1
   jumpForce: 5
-  globalGravity: 10
-  state: 
 --- !u!212 &1783373001
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1550,7 +1546,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 5f63e5bf93e99844ea168c8867d755fe, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3843adecd0e13eb4faa08383efea2609, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1569,8 +1565,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1783372996}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 14.966, y: 56.797, z: -6.8266}
-  m_LocalScale: {x: 3.8771796, y: 3.8771796, z: 3.8771796}
+  m_LocalPosition: {x: 14.966, y: 56.799, z: -6.8266}
+  m_LocalScale: {x: 4.513425, y: 4.513425, z: 4.513425}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4

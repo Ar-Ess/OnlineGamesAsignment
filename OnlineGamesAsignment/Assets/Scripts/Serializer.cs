@@ -19,11 +19,11 @@ public class Serializer: MonoBehaviour
         DontDestroyOnLoad(this);
     }
 
-    public MemoryStream Serialize(string text)
+    public MemoryStream Serialize(int flag) //We work with flags so we need to serialize integers
     {
         MemoryStream stream = new MemoryStream();
         BinaryWriter writer = new BinaryWriter(stream);
-        writer.Write(text);
+        writer.Write(flag);
         Debug.Log("serialized");
         return stream;
     }
@@ -32,7 +32,7 @@ public class Serializer: MonoBehaviour
     {
         BinaryReader reader = new BinaryReader(stream);
         stream.Seek(0, SeekOrigin.Begin);
-        string recString = reader.ReadString();
+        string recString = reader.ReadInt32().ToString();
         Debug.Log("string" + recString.ToString());
         return recString;
     }

@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float acceleration = 1;
     [SerializeField] float jumpForce = 50;
 
-    Serializer serializer = new Serializer();
+    
     public MemoryStream stream = new MemoryStream();
 
     float gravityScale = 10;
@@ -35,6 +35,8 @@ public class PlayerMovement : MonoBehaviour
     {
         PlayerMove();
         if (Input.GetKey(KeyCode.Space) && ground) Jump();
+
+        
     }
 
     private void PlayerMove()
