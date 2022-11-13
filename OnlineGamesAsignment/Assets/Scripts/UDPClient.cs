@@ -15,8 +15,18 @@ public class UDPClient : MonoBehaviour
     string stringData = "Hello";
     byte[] data = new byte[1024];
     Thread thr;
+    Thread rcv;
     public InputField field;
     PlayerMovement player;
+
+    enum ClientState
+    {
+        IDLE,
+        RECIEVING,
+        SENDING,
+    }
+
+    ClientState status;
 
     private UDPClient _instance;
     public UDPClient Instance { get { return _instance; } }
@@ -32,11 +42,17 @@ public class UDPClient : MonoBehaviour
 
         DontDestroyOnLoad(this);
 
+        status = ClientState.IDLE;
     }
 
     private void Update()
     {
         if (connectToScene) ChangeScene();
+
+        if(status == ClientState.RECIEVING)
+        {
+            rcv.Start();
+        }
     }
 
     private void ConnectClient()
@@ -54,16 +70,28 @@ public class UDPClient : MonoBehaviour
 
         data = Encoding.ASCII.GetBytes(stringData);
         clientSocket.Send(data, data.Length, SocketFlags.None);
-        clientSocket.ReceiveFrom(data, ref ep);
-        Debug.Log("received data from" + ep.ToString());
+        status = ClientState.RECIEVING;
+        thr.Abort();
 
         
+    }
+
+    private void Receive()
+    {
+        data = new byte[1024];
+        clientSocket.ReceiveFrom(data, ref ep);
+        stringData = Encoding.ASCII.GetString(data);
+        Debug.Log("Received message from: " + ep.ToString());
+        Debug.Log("Message: " + stringData);
+        status = ClientState.SENDING;
+        rcv.Abort();
     }
 
     public void JoinServer()
     {
         ep = new IPEndPoint(IPAddress.Parse(serverIP), 5554);
         thr = new Thread(new ThreadStart(ConnectClient));
+        rcv = new Thread(new ThreadStart(Receive));
         thr.Start();
     }
 
@@ -82,6 +110,7 @@ public class UDPClient : MonoBehaviour
     private void OnApplicationQuit()
     {
         if (thr != null) thr.Abort();
+        if (rcv != null) rcv.Abort();
         if (clientSocket.Connected) clientSocket.Disconnect(false);
         clientSocket.Close();
     }

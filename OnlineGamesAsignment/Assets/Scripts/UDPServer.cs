@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using UnityEngine.SceneManagement;
-
+using System.Collections.Generic;
 
 public class UDPServer : MonoBehaviour
 {
@@ -13,11 +13,24 @@ public class UDPServer : MonoBehaviour
     Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
     EndPoint remote;
     Thread thr;
+    Thread snd;
     [SerializeField] int maxPlayers;
     string stringData = string.Empty;
 
+    ServerState status;
+
+    private List<IPEndPoint> clientsUDP = new List<IPEndPoint>();
+
     private UDPServer _instance;
     public UDPServer Instance { get { return _instance; } }
+
+    enum ServerState
+    {
+        LISTENING,
+        SENDING,
+        RECIEVING,
+
+    }
 
     private void Awake()
     {
@@ -32,6 +45,14 @@ public class UDPServer : MonoBehaviour
 
     }
 
+    private void Update()
+    {
+        if(status == ServerState.SENDING)
+        {
+            snd.Start();
+        }
+    }
+
     public void SetupServer()
     {
         Debug.Log("Setting up udp server...");
@@ -40,8 +61,10 @@ public class UDPServer : MonoBehaviour
 
         Debug.Log("Waiting for client...");
         thr = new Thread(new ThreadStart(Listen));
+        snd = new Thread(new ThreadStart(Send));
         thr.Start();
 
+        status = ServerState.LISTENING;
     }
     private void Listen()
     {
@@ -55,22 +78,37 @@ public class UDPServer : MonoBehaviour
             serverSocket.ReceiveFrom(data, ref remote);
             stringData = Encoding.ASCII.GetString(data);
 
+            if (data != null)
+            {
+                numPlayers++;
+                clientsUDP.Add((IPEndPoint)remote);
+            }
+
             numPlayers++;
 
             Debug.Log("Message received from {0}: " + remote.ToString());
             Debug.Log("Message: " + stringData);
-            Debug.Log("Welcome to NoNameServer!");
-
-            string welcome = "Welcome to my test server";
-            data = Encoding.ASCII.GetBytes(welcome);
-            serverSocket.SendTo(data, data.Length, SocketFlags.None, remote);
         }
+        status = ServerState.SENDING;
         thr.Abort();
+    }
+
+    private void Send()
+    {
+        stringData = "Welcome to NoNameServer";
+        data = Encoding.ASCII.GetBytes(stringData);
+        foreach(IPEndPoint i in clientsUDP)
+        {
+            serverSocket.SendTo(data, i);
+        }
+        status = ServerState.RECIEVING;
+        snd.Abort();
     }
 
     private void OnApplicationQuit()
     {
         if (thr != null) thr.Abort();
+        if (snd != null) snd.Abort();
         if (serverSocket.Connected) serverSocket.Disconnect(false);
         serverSocket.Close();
     }
