@@ -8,12 +8,20 @@ public class OnlinePlayerMovement : MonoBehaviour
     SpriteRenderer sprite;
     Animator anim;
 
+    bool receiveInputs = false;
+    StreamFlag flag = new StreamFlag(0);
+
     [Header("Physics")]
     [SerializeField] float speed = 50;
     [SerializeField] float acceleration = 1;
     [SerializeField] float jumpForce = 50;
 
     Rigidbody rb;
+
+    private void Awake()
+    {
+        transform.position = spawnpoint.position;
+    }
 
     private void Start()
     {
@@ -22,31 +30,44 @@ public class OnlinePlayerMovement : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
     }
 
-    public void MovementLogic(uint uflag)
+    private void Update()
     {
-        StreamFlag flag = new StreamFlag(uflag);
+        if (receiveInputs) MovementLogic();
+    }
+
+    public void SetFlag(uint uflag)
+    {
+        flag = new StreamFlag(uflag);
+        receiveInputs = true;
+    }
+
+    private void MovementLogic()
+    {
         if (!flag.IsAnyTrue())
         {
             anim.SetInteger("Animation", 0);
+            receiveInputs = false;
             return;
         }
 
         if (flag.Get(0)) MoveRight();
         if (flag.Get(1)) MoveLeft();
         if (flag.Get(2)) Jump();
+
+        receiveInputs = false;
     }
 
     private void MoveLeft()
     {
-        rb.velocity = new Vector2(speed, rb.velocity.y);
-        sprite.flipX = false;
+        rb.velocity = new Vector2(-speed, rb.velocity.y);
+        sprite.flipX = true;
         anim.SetInteger("Animation", 1);
     }
     
     private void MoveRight()
     {
-        rb.velocity = new Vector2(-speed, rb.velocity.y);
-        sprite.flipX = true;
+        rb.velocity = new Vector2(speed, rb.velocity.y);
+        sprite.flipX = false;
         anim.SetInteger("Animation", 1);
     }
 

@@ -7,15 +7,25 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.IO;
 
-struct OnlinePlayer
+class OnlinePlayer
 {
-    public OnlinePlayer(IPEndPoint ep, GameObject player)
+    public OnlinePlayer(IPEndPoint ep)
     {
         this.ep = ep;
-        this.player = player;
-        this.movement = player.GetComponent<OnlinePlayerMovement>();
+        player = null;
+        movement = null;
+        built = new bool();
+        built = false;
     }
 
+    public void SetOnlinePlayer(GameObject player)
+    {
+        this.player = player;
+        this.movement = player.GetComponent<OnlinePlayerMovement>();
+        built = true;
+    }
+
+    public bool built;
     public IPEndPoint ep;
     public GameObject player;
     public OnlinePlayerMovement movement;
@@ -65,6 +75,17 @@ public class UDPServer : MonoBehaviour
 
     }
 
+    private void Update()
+    {
+        if (true) //TODO: Keep track of amount of players built and do a if here to check if all builts done. so program does not have to iterate foreach every time
+        {
+            foreach (OnlinePlayer player in clientsUDP)
+            {
+                if (!player.built) player.SetOnlinePlayer(Instantiate(onlinePlayer));
+            }
+        }
+    }
+
     public void SetupServer()
     {
         Debug.Log("Setting up udp server...");
@@ -94,7 +115,7 @@ public class UDPServer : MonoBehaviour
             if (data != null)
             {
                 numPlayers++;
-                clientsUDP.Add(new OnlinePlayer((IPEndPoint)remote, Instantiate(onlinePlayer)));
+                clientsUDP.Add(new OnlinePlayer((IPEndPoint)remote));
             }
 
             Debug.Log("Message received from {0}: " + remote.ToString());
@@ -122,6 +143,7 @@ public class UDPServer : MonoBehaviour
         {
             foreach(OnlinePlayer player in clientsUDP)
             {
+                if (!player.built) continue;
                 EndPoint ip = player.ep;
                 byte[] buffer = new byte[1024];
 
@@ -130,7 +152,7 @@ public class UDPServer : MonoBehaviour
                 uint recUint = serializer.Deserialize(recvStream);
                 //Debug.Log("Received message from: " + remote.ToString());
                 Debug.Log("Message: " + recUint);
-                player.movement.MovementLogic(recUint);
+                player.movement.SetFlag(recUint);
             }
             
         }

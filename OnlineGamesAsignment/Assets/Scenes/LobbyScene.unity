@@ -625,7 +625,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localPlayer: {fileID: 6823275868626177215, guid: 937129c9e72651d47a4ae967463967c1, type: 3}
-  onlinePlayer: {fileID: 4824749878826672958, guid: 6bb449fb25d8de34eab5b2ec05d1651d, type: 3}
 --- !u!4 &788418779
 Transform:
   m_ObjectHideFlags: 0

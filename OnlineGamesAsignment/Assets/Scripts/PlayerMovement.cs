@@ -5,9 +5,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-
-    [SerializeField] Camera camera;
-    [SerializeField] Transform spawnpoint;
+    [SerializeField] private Transform spawnpoint;
     SpriteRenderer sprite;
     Animator anim;
 
@@ -16,19 +14,17 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float acceleration = 1;
     [SerializeField] float jumpForce = 50;
 
-    StreamFlag flag = new StreamFlag(0);
-
-    int identifier = 10234;
-
-    
-    public MemoryStream stream = new MemoryStream();
-    public uint recUint = 0;
-
+    private StreamFlag flag = new StreamFlag(0);
+    private MemoryStream stream = new MemoryStream();
     bool ground = false;
-
     Rigidbody rb;
 
     public Serializer serializer = new Serializer();
+
+    private void Awake()
+    {
+        transform.position = spawnpoint.position;
+    }
 
     public bool IsAnyInputActive()
     {
@@ -63,20 +59,20 @@ public class PlayerMovement : MonoBehaviour
             anim.SetInteger("Animation", 1);
             flag.Set(0, true);
         }
-  
+
         else if (rb.velocity.x < 0 && rb.velocity.y <= 0.1 && ground)
         {
             sprite.flipX = true;
             anim.SetInteger("Animation", 1);
             flag.Set(1, true);
         }
-        
-        else if(rb.velocity.x == 0 )
+
+        else if (rb.velocity.x == 0)
         {
             anim.SetInteger("Animation", 0);
         }
 
-        else if(rb.velocity.y > 0 && !ground)
+        else if (rb.velocity.y > 0 && !ground)
         {
             anim.SetInteger("Animation", 2);
         }
@@ -92,13 +88,21 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        if(collision.collider.tag == "Ground")
-        ground = true;
+        if (collision.collider.tag == "Ground")
+            ground = true;
     }
 
     private void OnCollisionExit(Collision collision)
     {
         if (collision.collider.tag == "Ground")
             ground = false;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "OnlinePlayer")
+        {
+            Physics.IgnoreCollision(collision.gameObject.GetComponent<Collider>(), collision.collider);
+        }
     }
 }
