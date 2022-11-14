@@ -18,16 +18,27 @@ public class PlayerMovement : MonoBehaviour
 
     StreamFlag flag = new StreamFlag(0);
 
+    int identifier = 10234;
+
     
     public MemoryStream stream = new MemoryStream();
     public uint recUint = 0;
 
-    float gravityScale = 10;
     bool ground = false;
 
     Rigidbody rb;
 
     public Serializer serializer = new Serializer();
+
+    public bool IsAnyInputActive()
+    {
+        return flag.IsAnyTrue();
+    }
+
+    public uint GetFlag()
+    {
+        return flag.flag;
+    }
 
     private void Start()
     {
@@ -38,12 +49,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        flag.Clear();
         PlayerMove();
-        if (Input.GetKey(KeyCode.Space) && ground) Jump();
-
-        MovementSend();
-
-        
     }
 
     private void PlayerMove()
@@ -54,12 +61,14 @@ public class PlayerMovement : MonoBehaviour
         {
             sprite.flipX = false;
             anim.SetInteger("Animation", 1);
+            flag.Set(0, true);
         }
   
         else if (rb.velocity.x < 0 && rb.velocity.y <= 0.1 && ground)
         {
             sprite.flipX = true;
             anim.SetInteger("Animation", 1);
+            flag.Set(1, true);
         }
         
         else if(rb.velocity.x == 0 )
@@ -71,30 +80,12 @@ public class PlayerMovement : MonoBehaviour
         {
             anim.SetInteger("Animation", 2);
         }
-    }
 
-    private void MovementSend()
-    {
-        if(Input.GetAxisRaw("Horizontal") > 0)
-        {
-            flag.Set(0, true); // flag set to: 00000001
-        }
-
-        if(Input.GetAxisRaw("Horizontal") < 0) // flag set to: 00000010
-        {
-            flag.Set(1, true);
-        }
-        
-        if(Input.GetKey(KeyCode.Space) && ground) // flag set to: 00000100
+        if (Input.GetKey(KeyCode.Space) && ground)
         {
             flag.Set(2, true);
+            Jump();
         }
-
-        flag.Set(3, true);
-
-        stream = serializer.Serialize(flag.flag);
-        
-        
     }
 
     private void Jump() => rb.velocity = new Vector2(0, jumpForce);

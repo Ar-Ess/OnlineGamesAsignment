@@ -18,7 +18,9 @@ public class UDPClient : MonoBehaviour
     Thread snd;
     Thread rcv;
     public InputField field;
-    PlayerMovement player = new PlayerMovement();
+    private PlayerMovement localPlayer = null;
+    bool getPlayer = false;
+    private Serializer serializer = new Serializer();
 
     enum ClientState
     {
@@ -48,9 +50,13 @@ public class UDPClient : MonoBehaviour
 
     private void Update()
     {
+        if (getPlayer && localPlayer == null)
+        {
+            localPlayer = GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerMovement>();
+            getPlayer = false;
+        }
         if (connectToScene) ChangeScene();
     }
-
     private void ConnectClient()
     {
 
@@ -91,17 +97,16 @@ public class UDPClient : MonoBehaviour
 
         while (true)
         {
-            if (player.stream == null) return;
+            if (!localPlayer) continue;
+            if (localPlayer.stream == null) continue;
+            if (!localPlayer.IsAnyInputActive()) continue;
 
-            else
-            {
+            clientSocket.SendTo(serializer.Serialize(localPlayer.GetFlag()).GetBuffer(), ep);
+            Debug.Log("Message sent: " + localPlayer.stream.ToString());
 
-                clientSocket.SendTo(player.stream.GetBuffer(), ep);
-                Debug.Log("Message sent: " + player.stream.ToString());
-            }
-            
         }
-                   
+
+        snd.Abort();
 
     }
 
@@ -116,8 +121,9 @@ public class UDPClient : MonoBehaviour
 
     private void ChangeScene()
     {
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene("LobbyScene");
         connectToScene = false;
+        getPlayer = true;
     }
 
     public void ChangeStringIP()

@@ -4,16 +4,17 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    [SerializeField] private GameObject player;
+    private GameObject player = null;
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!player) player = GameObject.FindGameObjectWithTag("LocalPlayer");
+
         Movement();
     }
 
