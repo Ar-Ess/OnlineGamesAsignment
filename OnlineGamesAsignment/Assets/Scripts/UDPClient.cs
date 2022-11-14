@@ -15,9 +15,10 @@ public class UDPClient : MonoBehaviour
     string stringData = "Hello";
     byte[] data = new byte[1024];
     Thread thr;
+    Thread snd;
     Thread rcv;
     public InputField field;
-    PlayerMovement player;
+    PlayerMovement player = new PlayerMovement();
 
     enum ClientState
     {
@@ -48,11 +49,6 @@ public class UDPClient : MonoBehaviour
     private void Update()
     {
         if (connectToScene) ChangeScene();
-
-        if(status == ClientState.RECIEVING)
-        {
-            rcv.Start();
-        }
     }
 
     private void ConnectClient()
@@ -70,7 +66,8 @@ public class UDPClient : MonoBehaviour
 
         data = Encoding.ASCII.GetBytes(stringData);
         clientSocket.Send(data, data.Length, SocketFlags.None);
-        status = ClientState.RECIEVING;
+        rcv.Start();
+        snd.Start();
         thr.Abort();
 
         
@@ -78,13 +75,33 @@ public class UDPClient : MonoBehaviour
 
     private void Receive()
     {
-        data = new byte[1024];
-        clientSocket.ReceiveFrom(data, ref ep);
-        stringData = Encoding.ASCII.GetString(data);
+        byte[] recvBuff = new byte[1024];
+        clientSocket.ReceiveFrom(recvBuff, ref ep);
+        string dataRecv = Encoding.ASCII.GetString(recvBuff);
         Debug.Log("Received message from: " + ep.ToString());
-        Debug.Log("Message: " + stringData);
-        status = ClientState.SENDING;
-        rcv.Abort();
+        Debug.Log("Message: " + dataRecv);
+
+    }
+
+    private void Send()
+    {
+        byte[] sendBuff = new byte[1024];
+        string dataSent = "Sup bro";
+        sendBuff = Encoding.ASCII.GetBytes(dataSent);
+
+        while (true)
+        {
+            if (player.stream == null) return;
+
+            else
+            {
+                clientSocket.Send(player.stream.ToArray(), player.stream.ToArray().Length, SocketFlags.None);
+                Debug.Log("Message sent: " + player.stream.ToString());
+            }
+            
+        }
+                   
+
     }
 
     public void JoinServer()
@@ -92,6 +109,7 @@ public class UDPClient : MonoBehaviour
         ep = new IPEndPoint(IPAddress.Parse(serverIP), 5554);
         thr = new Thread(new ThreadStart(ConnectClient));
         rcv = new Thread(new ThreadStart(Receive));
+        snd = new Thread(new ThreadStart(Send));
         thr.Start();
     }
 
@@ -111,6 +129,7 @@ public class UDPClient : MonoBehaviour
     {
         if (thr != null) thr.Abort();
         if (rcv != null) rcv.Abort();
+        if (snd != null) snd.Abort();
         if (clientSocket.Connected) clientSocket.Disconnect(false);
         clientSocket.Close();
     }

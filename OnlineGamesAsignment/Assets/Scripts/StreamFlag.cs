@@ -1,7 +1,7 @@
 ﻿
 public class StreamFlag
 {
-	uint flag = 0;
+	public uint flag = 0;
 
 	public StreamFlag(uint flag)
 	{
@@ -9,7 +9,7 @@ public class StreamFlag
 	}
 
 	// Set an specific flag from slot 0 to 7
-	void Set(ushort index, bool state)
+	public void Set(ushort index, bool state)
 	{
 		// Flags only have 8 slots available
 		if (!(index >= 0 && index < 8)) return;
@@ -23,10 +23,10 @@ public class StreamFlag
 	}
 
 	// Set the whole flag
-	void Set(uint flag) { this.flag = flag; }
+	public void Set(uint flag) { this.flag = flag; }
 
 	// Get an specific flag
-	bool Get(ushort index)
+	public bool Get(ushort index)
 	{
 		// Flags only have 8 slots available
 		if (!(index >= 0 && index < 8)) return false;
@@ -36,21 +36,22 @@ public class StreamFlag
 
 		mod = flag & mod;
 
+
 		return (mod != 0);
 	}
 
 	// Inverts the state of all the flags
-	void Invert() 
+	public void Invert() 
 	{ 
 		flag = ~flag; 
 	}
 
-	bool IsAnyTrue() 
+	public bool IsAnyTrue() 
 	{ 
 		return flag != 0; 
 	}
 
-	void Clear() 
+	public void Clear() 
 	{ 
 		flag = 0; 
 	}

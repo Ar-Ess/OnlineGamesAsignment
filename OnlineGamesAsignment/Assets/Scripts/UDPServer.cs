@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using System.IO;
 
 public class UDPServer : MonoBehaviour
 {
@@ -14,8 +15,11 @@ public class UDPServer : MonoBehaviour
     EndPoint remote;
     Thread thr;
     Thread snd;
+    Thread rcv;
     [SerializeField] int maxPlayers;
     string stringData = string.Empty;
+    PlayerMovement player = new PlayerMovement();
+    MemoryStream recvStream = new MemoryStream();
 
     ServerState status;
 
@@ -47,10 +51,7 @@ public class UDPServer : MonoBehaviour
 
     private void Update()
     {
-        if(status == ServerState.SENDING)
-        {
-            snd.Start();
-        }
+     
     }
 
     public void SetupServer()
@@ -62,6 +63,7 @@ public class UDPServer : MonoBehaviour
         Debug.Log("Waiting for client...");
         thr = new Thread(new ThreadStart(Listen));
         snd = new Thread(new ThreadStart(Send));
+        rcv = new Thread(new ThreadStart(Receive));
         thr.Start();
 
         status = ServerState.LISTENING;
@@ -88,8 +90,10 @@ public class UDPServer : MonoBehaviour
 
             Debug.Log("Message received from {0}: " + remote.ToString());
             Debug.Log("Message: " + stringData);
+            rcv.Start();
+            snd.Start();
         }
-        status = ServerState.SENDING;
+         
         thr.Abort();
     }
 
@@ -100,15 +104,31 @@ public class UDPServer : MonoBehaviour
         foreach(IPEndPoint i in clientsUDP)
         {
             serverSocket.SendTo(data, i);
+        }     
+    }
+
+    private void Receive()
+    {
+        while(true)
+        {
+            foreach(IPEndPoint i in clientsUDP)
+            {
+                EndPoint ip = i;
+                serverSocket.ReceiveFrom(recvStream.ToArray(), ref ip);
+                uint recUint = player.serializer.Deserialize(recvStream);
+                //Debug.Log("Received message from: " + remote.ToString());
+                Debug.Log("Message: " + recUint);
+            }
+            
         }
-        status = ServerState.RECIEVING;
-        snd.Abort();
+        
     }
 
     private void OnApplicationQuit()
     {
         if (thr != null) thr.Abort();
         if (snd != null) snd.Abort();
+        if (rcv != null) rcv.Abort();
         if (serverSocket.Connected) serverSocket.Disconnect(false);
         serverSocket.Close();
     }

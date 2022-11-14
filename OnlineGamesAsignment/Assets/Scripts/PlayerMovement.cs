@@ -16,13 +16,18 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float acceleration = 1;
     [SerializeField] float jumpForce = 50;
 
+    StreamFlag flag = new StreamFlag(0);
+
     
     public MemoryStream stream = new MemoryStream();
+    public uint recUint = 0;
 
     float gravityScale = 10;
     bool ground = false;
 
     Rigidbody rb;
+
+    public Serializer serializer = new Serializer();
 
     private void Start()
     {
@@ -35,6 +40,8 @@ public class PlayerMovement : MonoBehaviour
     {
         PlayerMove();
         if (Input.GetKey(KeyCode.Space) && ground) Jump();
+
+        MovementSend();
 
         
     }
@@ -64,6 +71,30 @@ public class PlayerMovement : MonoBehaviour
         {
             anim.SetInteger("Animation", 2);
         }
+    }
+
+    private void MovementSend()
+    {
+        if(Input.GetAxisRaw("Horizontal") > 0)
+        {
+            flag.Set(0, true); // flag set to: 00000001
+        }
+
+        if(Input.GetAxisRaw("Horizontal") < 0) // flag set to: 00000010
+        {
+            flag.Set(1, true);
+        }
+        
+        if(Input.GetKey(KeyCode.Space) && ground) // flag set to: 00000100
+        {
+            flag.Set(2, true);
+        }
+
+        flag.Set(3, true);
+
+        stream = serializer.Serialize(flag.flag);
+        
+        
     }
 
     private void Jump() => rb.velocity = new Vector2(0, jumpForce);
