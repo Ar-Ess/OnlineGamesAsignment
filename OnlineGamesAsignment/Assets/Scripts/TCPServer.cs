@@ -96,6 +96,6 @@ public class TCPServer : MonoBehaviour
 
     private void ChangeScene()
     {
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene("LobbyScene");
     }
 }
