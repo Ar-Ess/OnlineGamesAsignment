@@ -121,7 +121,7 @@ public class UDPServer : MonoBehaviour
                 recvStream = new MemoryStream(buffer);
                 uint recUint = serializer.Deserialize(recvStream);
                 //Debug.Log("Received message from: " + remote.ToString());
-                Debug.Log("Message: " + recUint);
+                //Debug.Log("Message: " + recUint);
                 player.movement.SetFlag(recUint);
             }
             

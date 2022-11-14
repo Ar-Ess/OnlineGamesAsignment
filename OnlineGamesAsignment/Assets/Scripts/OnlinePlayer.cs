@@ -12,15 +12,6 @@ class OnlinePlayer
         built = false;
     }
 
-    public OnlinePlayer(IPEndPoint ep, GameObject player)
-    {
-        this.ep = ep;
-        this.player = player;
-        movement = player.GetComponent<OnlinePlayerMovement>();
-        built = new bool();
-        built = true;
-    }
-
     public void SetOnlinePlayer(GameObject player)
     {
         this.player = player;

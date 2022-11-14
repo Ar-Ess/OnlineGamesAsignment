@@ -45,6 +45,14 @@ public class UDPClient : MonoBehaviour
 
     private void Update()
     {
+        if (true) //TODO: Keep track of amount of players built and do a if here to check if all builts done. so program does not have to iterate foreach every time
+        {
+            foreach (OnlinePlayer player in players)
+            {
+                if (!player.built) player.SetOnlinePlayer(Instantiate(onlinePlayer));
+            }
+        }
+
         if (getPlayer && localPlayer == null)
         {
             localPlayer = GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerMovement>();
@@ -73,13 +81,23 @@ public class UDPClient : MonoBehaviour
 
     private void Receive()
     {
-        byte[] buffer = new byte[1024];
-        clientSocket.ReceiveFrom(buffer, ref ep);
-        recvStream = new MemoryStream(buffer);
-        uint recUint = serializer.Deserialize(recvStream);
-        //Debug.Log("Received message from: " + remote.ToString());
-        Debug.Log("Message: " + recUint);
-        players[0].movement.SetFlag(recUint);
+        while (true)
+        {
+            foreach (OnlinePlayer player in players)
+            {
+                if (!player.built) continue;
+
+                EndPoint ip = player.ep;
+                byte[] buffer = new byte[1024];
+
+                clientSocket.ReceiveFrom(buffer, ref ip);
+                recvStream = new MemoryStream(buffer);
+                uint recUint = serializer.Deserialize(recvStream);
+                //Debug.Log("Received message from: " + remote.ToString());
+                Debug.Log("Message: " + recUint);
+                player.movement.SetFlag(recUint);
+            }
+        }
     }
 
     private void Send()
@@ -107,13 +125,14 @@ public class UDPClient : MonoBehaviour
 
     private void ChangeScene(string scene)
     {
+        SceneManager.LoadScene(scene);
+
         if (scene == "LobbyScene")
         {
             connectToScene = false;
             getPlayer = true;
-            players.Add(new OnlinePlayer((IPEndPoint)ep, Instantiate(onlinePlayer)));
+            players.Add(new OnlinePlayer((IPEndPoint)ep));
         }
-        SceneManager.LoadScene(scene);
     }
 
     public void ChangeStringIP()

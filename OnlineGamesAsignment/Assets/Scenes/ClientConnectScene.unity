@@ -1610,6 +1610,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   field: {fileID: 1811868981}
+  onlinePlayer: {fileID: 4824749878826672958, guid: 6bb449fb25d8de34eab5b2ec05d1651d, type: 3}
 --- !u!4 &1824764954
 Transform:
   m_ObjectHideFlags: 0
