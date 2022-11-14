@@ -3,22 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class Serializer: MonoBehaviour
+public class Serializer : MonoBehaviour
 {
-    private Serializer _instance;
-    public Serializer instance { get { return _instance; } }
-
-    void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-
-        else _instance = this;
-        DontDestroyOnLoad(this);
-    }
-
     public MemoryStream Serialize(uint flag) //We work with flags so we need to serialize integers
     {
         MemoryStream stream = new MemoryStream();

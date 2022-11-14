@@ -7,6 +7,20 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.IO;
 
+struct OnlinePlayer
+{
+    public OnlinePlayer(IPEndPoint ep, GameObject player)
+    {
+        this.ep = ep;
+        this.player = player;
+        this.movement = player.GetComponent<OnlinePlayerMovement>();
+    }
+
+    public IPEndPoint ep;
+    public GameObject player;
+    public OnlinePlayerMovement movement;
+};
+
 public class UDPServer : MonoBehaviour
 {
     byte[] data = new byte[1024];
@@ -18,12 +32,14 @@ public class UDPServer : MonoBehaviour
     Thread rcv;
     [SerializeField] int maxPlayers;
     string stringData = string.Empty;
-    PlayerMovement player = new PlayerMovement();
+    PlayerMovement localPlayer = new PlayerMovement();
     MemoryStream recvStream = new MemoryStream();
+    [SerializeField] private GameObject onlinePlayer;
+    private Serializer serializer = new Serializer();
 
     ServerState status;
 
-    private List<IPEndPoint> clientsUDP = new List<IPEndPoint>();
+    private List<OnlinePlayer> clientsUDP = new List<OnlinePlayer>();
 
     private UDPServer _instance;
     public UDPServer Instance { get { return _instance; } }
@@ -47,11 +63,6 @@ public class UDPServer : MonoBehaviour
 
         DontDestroyOnLoad(this);
 
-    }
-
-    private void Update()
-    {
-     
     }
 
     public void SetupServer()
@@ -83,7 +94,7 @@ public class UDPServer : MonoBehaviour
             if (data != null)
             {
                 numPlayers++;
-                clientsUDP.Add((IPEndPoint)remote);
+                clientsUDP.Add(new OnlinePlayer((IPEndPoint)remote, Instantiate(onlinePlayer)));
             }
 
             Debug.Log("Message received from {0}: " + remote.ToString());
@@ -99,9 +110,9 @@ public class UDPServer : MonoBehaviour
     {
         stringData = "Welcome to NoNameServer";
         data = Encoding.ASCII.GetBytes(stringData);
-        foreach(IPEndPoint i in clientsUDP)
+        foreach(OnlinePlayer player in clientsUDP)
         {
-            serverSocket.SendTo(data, i);
+            serverSocket.SendTo(data, player.ep);
         }     
     }
 
@@ -109,16 +120,17 @@ public class UDPServer : MonoBehaviour
     {
         while(true)
         {
-            foreach(IPEndPoint i in clientsUDP)
+            foreach(OnlinePlayer player in clientsUDP)
             {
-                EndPoint ip = i;
+                EndPoint ip = player.ep;
                 byte[] buffer = new byte[1024];
 
                 serverSocket.ReceiveFrom(buffer, ref ip);
                 recvStream = new MemoryStream(buffer);
-                uint recUint = player.serializer.Deserialize(recvStream);
+                uint recUint = serializer.Deserialize(recvStream);
                 //Debug.Log("Received message from: " + remote.ToString());
                 Debug.Log("Message: " + recUint);
+                player.movement.MovementLogic(recUint);
             }
             
         }
