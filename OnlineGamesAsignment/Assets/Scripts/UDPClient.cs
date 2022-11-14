@@ -95,7 +95,8 @@ public class UDPClient : MonoBehaviour
 
             else
             {
-                clientSocket.Send(player.stream.ToArray(), player.stream.ToArray().Length, SocketFlags.None);
+
+                clientSocket.SendTo(player.stream.GetBuffer(), ep);
                 Debug.Log("Message sent: " + player.stream.ToString());
             }
             

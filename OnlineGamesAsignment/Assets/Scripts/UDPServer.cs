@@ -86,8 +86,6 @@ public class UDPServer : MonoBehaviour
                 clientsUDP.Add((IPEndPoint)remote);
             }
 
-            numPlayers++;
-
             Debug.Log("Message received from {0}: " + remote.ToString());
             Debug.Log("Message: " + stringData);
             rcv.Start();
@@ -114,7 +112,10 @@ public class UDPServer : MonoBehaviour
             foreach(IPEndPoint i in clientsUDP)
             {
                 EndPoint ip = i;
-                serverSocket.ReceiveFrom(recvStream.ToArray(), ref ip);
+                byte[] buffer = new byte[1024];
+
+                serverSocket.ReceiveFrom(buffer, ref ip);
+                recvStream = new MemoryStream(buffer);
                 uint recUint = player.serializer.Deserialize(recvStream);
                 //Debug.Log("Received message from: " + remote.ToString());
                 Debug.Log("Message: " + recUint);
