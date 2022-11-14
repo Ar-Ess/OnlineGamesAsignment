@@ -98,12 +98,9 @@ public class UDPClient : MonoBehaviour
         while (true)
         {
             if (!localPlayer) continue;
-            if (localPlayer.stream == null) continue;
             if (!localPlayer.IsAnyInputActive()) continue;
 
             clientSocket.SendTo(serializer.Serialize(localPlayer.GetFlag()).GetBuffer(), ep);
-            Debug.Log("Message sent: " + localPlayer.stream.ToString());
-
         }
 
         snd.Abort();
