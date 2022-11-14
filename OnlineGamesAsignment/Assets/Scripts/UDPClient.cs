@@ -5,6 +5,8 @@ using System.Net;
 using System.Threading;
 using UnityEngine.UI;
 using System.Text;
+using System.Collections.Generic;
+using System.IO;
 
 public class UDPClient : MonoBehaviour
 {
@@ -19,17 +21,12 @@ public class UDPClient : MonoBehaviour
     Thread rcv;
     public InputField field;
     private PlayerMovement localPlayer = null;
+    MemoryStream recvStream = new MemoryStream();
     bool getPlayer = false;
     private Serializer serializer = new Serializer();
+    [SerializeField] private GameObject onlinePlayer;
+    private List<OnlinePlayer> players = new List<OnlinePlayer>();
 
-    enum ClientState
-    {
-        IDLE,
-        RECIEVING,
-        SENDING,
-    }
-
-    ClientState status;
 
     private UDPClient _instance;
     public UDPClient Instance { get { return _instance; } }
@@ -44,8 +41,6 @@ public class UDPClient : MonoBehaviour
         else _instance = this;
 
         DontDestroyOnLoad(this);
-
-        status = ClientState.IDLE;
     }
 
     private void Update()
@@ -55,11 +50,10 @@ public class UDPClient : MonoBehaviour
             localPlayer = GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerMovement>();
             getPlayer = false;
         }
-        if (connectToScene) ChangeScene();
+        if (connectToScene) ChangeScene("LobbyScene");
     }
     private void ConnectClient()
     {
-
         clientSocket.Connect(ep);
 
         if (!clientSocket.Connected)
@@ -75,26 +69,21 @@ public class UDPClient : MonoBehaviour
         rcv.Start();
         snd.Start();
         thr.Abort();
-
-        
     }
 
     private void Receive()
     {
-        byte[] recvBuff = new byte[1024];
-        clientSocket.ReceiveFrom(recvBuff, ref ep);
-        string dataRecv = Encoding.ASCII.GetString(recvBuff);
-        Debug.Log("Received message from: " + ep.ToString());
-        Debug.Log("Message: " + dataRecv);
-
+        byte[] buffer = new byte[1024];
+        clientSocket.ReceiveFrom(buffer, ref ep);
+        recvStream = new MemoryStream(buffer);
+        uint recUint = serializer.Deserialize(recvStream);
+        //Debug.Log("Received message from: " + remote.ToString());
+        Debug.Log("Message: " + recUint);
+        players[0].movement.SetFlag(recUint);
     }
 
     private void Send()
     {
-        byte[] sendBuff = new byte[1024];
-        string dataSent = "Sup bro";
-        sendBuff = Encoding.ASCII.GetBytes(dataSent);
-
         while (true)
         {
             if (!localPlayer) continue;
@@ -116,11 +105,15 @@ public class UDPClient : MonoBehaviour
         thr.Start();
     }
 
-    private void ChangeScene()
+    private void ChangeScene(string scene)
     {
-        SceneManager.LoadScene("LobbyScene");
-        connectToScene = false;
-        getPlayer = true;
+        if (scene == "LobbyScene")
+        {
+            connectToScene = false;
+            getPlayer = true;
+            players.Add(new OnlinePlayer((IPEndPoint)ep, Instantiate(onlinePlayer)));
+        }
+        SceneManager.LoadScene(scene);
     }
 
     public void ChangeStringIP()

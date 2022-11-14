@@ -7,30 +7,6 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.IO;
 
-class OnlinePlayer
-{
-    public OnlinePlayer(IPEndPoint ep)
-    {
-        this.ep = ep;
-        player = null;
-        movement = null;
-        built = new bool();
-        built = false;
-    }
-
-    public void SetOnlinePlayer(GameObject player)
-    {
-        this.player = player;
-        this.movement = player.GetComponent<OnlinePlayerMovement>();
-        built = true;
-    }
-
-    public bool built;
-    public IPEndPoint ep;
-    public GameObject player;
-    public OnlinePlayerMovement movement;
-};
-
 public class UDPServer : MonoBehaviour
 {
     byte[] data = new byte[1024];
@@ -44,23 +20,12 @@ public class UDPServer : MonoBehaviour
     string stringData = string.Empty;
     PlayerMovement localPlayer = new PlayerMovement();
     MemoryStream recvStream = new MemoryStream();
-    [SerializeField] private GameObject onlinePlayer;
     private Serializer serializer = new Serializer();
-
-    ServerState status;
-
+    [SerializeField] private GameObject onlinePlayer;
     private List<OnlinePlayer> clientsUDP = new List<OnlinePlayer>();
 
     private UDPServer _instance;
     public UDPServer Instance { get { return _instance; } }
-
-    enum ServerState
-    {
-        LISTENING,
-        SENDING,
-        RECIEVING,
-
-    }
 
     private void Awake()
     {
@@ -97,8 +62,6 @@ public class UDPServer : MonoBehaviour
         snd = new Thread(new ThreadStart(Send));
         rcv = new Thread(new ThreadStart(Receive));
         thr.Start();
-
-        status = ServerState.LISTENING;
     }
     private void Listen()
     {
@@ -129,12 +92,19 @@ public class UDPServer : MonoBehaviour
 
     private void Send()
     {
-        stringData = "Welcome to NoNameServer";
-        data = Encoding.ASCII.GetBytes(stringData);
-        foreach(OnlinePlayer player in clientsUDP)
+        while (true)
         {
-            serverSocket.SendTo(data, player.ep);
-        }     
+            if (!localPlayer) continue;
+            if (!localPlayer.IsAnyInputActive()) continue;
+
+            foreach (OnlinePlayer player in clientsUDP)
+            {
+                if (!player.built) continue;
+                serverSocket.SendTo(serializer.Serialize(localPlayer.GetFlag()).GetBuffer(), player.ep);
+            }
+        }
+
+        snd.Abort();
     }
 
     private void Receive()
