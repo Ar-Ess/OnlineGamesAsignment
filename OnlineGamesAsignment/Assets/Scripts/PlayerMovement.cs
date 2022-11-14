@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody rb;
     Collider collider;
 
-    public Serializer serializer = new Serializer();
+    private Serializer serializer = new Serializer();
 
     private void Awake()
     {

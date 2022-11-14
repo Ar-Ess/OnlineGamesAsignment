@@ -29,7 +29,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6823275868626177215}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.188, y: 56.797, z: -6.8266}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 3.8771796, y: 3.8771796, z: 3.8771796}
   m_Children: []
   m_Father: {fileID: 0}
@@ -98,12 +98,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a64356e8ea48cd40864dc5c755614f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camera: {fileID: 0}
   spawnpoint: {fileID: 8039450701735286520, guid: ff8c95ab3a3ed4140ad0e0f39de82593, type: 3}
   speed: 5
   acceleration: 1
   jumpForce: 5
-  recUint: 0
   serializer: {fileID: 0}
 --- !u!65 &6823275868626177208
 BoxCollider:
