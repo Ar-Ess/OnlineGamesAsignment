@@ -18,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     private MemoryStream stream = new MemoryStream();
     bool ground = false;
     Rigidbody rb;
+    Collider collider;
 
     public Serializer serializer = new Serializer();
 
@@ -41,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
+        collider = GetComponent<Collider>();
     }
 
     private void Update()
@@ -102,7 +104,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.tag == "OnlinePlayer")
         {
-            Physics.IgnoreCollision(collision.gameObject.GetComponent<Collider>(), collision.collider);
+            Physics.IgnoreCollision(collision.collider, collider);
         }
     }
 }

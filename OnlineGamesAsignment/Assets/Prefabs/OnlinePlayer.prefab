@@ -146,7 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b0a6b5c17186ea41a53a84d72a71eed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnpoint: {fileID: 8039450701735286520, guid: ff8c95ab3a3ed4140ad0e0f39de82593, type: 3}
+  spawnpoint: {fileID: 2355364520980246248, guid: 450a0646a5e586549ab56a848762df11, type: 3}
   speed: 5
   acceleration: 1
   jumpForce: 5

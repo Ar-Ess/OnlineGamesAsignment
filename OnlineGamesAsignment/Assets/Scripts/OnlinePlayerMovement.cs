@@ -17,6 +17,7 @@ public class OnlinePlayerMovement : MonoBehaviour
     [SerializeField] float jumpForce = 50;
 
     Rigidbody rb;
+    Collider collider;
 
     private void Awake()
     {
@@ -28,6 +29,7 @@ public class OnlinePlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
+        collider = GetComponent<Collider>();
     }
 
     private void Update()
@@ -75,5 +77,13 @@ public class OnlinePlayerMovement : MonoBehaviour
     { 
         rb.velocity = new Vector2(0, jumpForce);
         anim.SetInteger("Animation", 2);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "LocalPlayer")
+        {
+            Physics.IgnoreCollision(collision.collider, collider);
+        }
     }
 }
