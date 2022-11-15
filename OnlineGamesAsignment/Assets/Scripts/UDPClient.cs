@@ -96,6 +96,8 @@ public class UDPClient : MonoBehaviour
                 //Debug.Log("Received message from: " + remote.ToString());
                 Debug.Log("Message: " + recUint);
                 player.movement.SetFlag(recUint);
+                recvStream.Flush();
+                recvStream.Dispose();
             }
         }
     }
