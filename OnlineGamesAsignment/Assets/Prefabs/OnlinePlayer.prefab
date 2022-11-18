@@ -149,4 +149,4 @@ MonoBehaviour:
   spawnpoint: {fileID: 2355364520980246248, guid: 450a0646a5e586549ab56a848762df11, type: 3}
   speed: 5
   acceleration: 1
-  jumpForce: 5
+  jumpForce: 6

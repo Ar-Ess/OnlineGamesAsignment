@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
+    [SerializeField] private Vector3 m_CameraOffset;
     private GameObject player = null;
     // Start is called before the first frame update
     void Start()
@@ -20,6 +21,6 @@ public class CameraMovement : MonoBehaviour
 
     private void Movement()
     {
-        transform.position = new Vector3(player.transform.position.x, player.transform.position.y,-9.8f);
+        transform.position = new Vector3(player.transform.position.x + m_CameraOffset.x, player.transform.position.y + m_CameraOffset.y, m_CameraOffset.z);
     }
 }

@@ -4,28 +4,24 @@ using UnityEngine;
 
 public class OnlinePlayerMovement : MonoBehaviour
 {
-    [SerializeField] Transform spawnpoint;
-    SpriteRenderer sprite;
-    Animator anim;
-
-    bool receiveInputs = false;
-    StreamFlag flag = new StreamFlag(0);
+    [Header("Placement")]
+    [SerializeField] private Transform spawnpoint;
 
     [Header("Physics")]
-    [SerializeField] float speed = 50;
-    [SerializeField] float acceleration = 1;
-    [SerializeField] float jumpForce = 50;
+    [SerializeField] float speed;
+    [SerializeField] float jumpForce;
 
-    Rigidbody rb;
-    Collider collider;
-
-    private void Awake()
-    {
-        transform.position = spawnpoint.position;
-    }
+    // Private
+    private StreamFlag flag = new StreamFlag(0);
+    private bool receiveInputs = false;
+    private Rigidbody rb;
+    private Collider collider;
+    private SpriteRenderer sprite;
+    private Animator anim;
 
     private void Start()
     {
+        transform.position = spawnpoint.position;
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
@@ -34,7 +30,7 @@ public class OnlinePlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (receiveInputs) MovementLogic();
+        if (receiveInputs) UpdateLogic();
     }
 
     public void SetFlag(uint uflag)
@@ -43,7 +39,7 @@ public class OnlinePlayerMovement : MonoBehaviour
         receiveInputs = true;
     }
 
-    private void MovementLogic()
+    private void UpdateLogic()
     {
         if (!flag.IsAnyTrue())
         {
@@ -52,38 +48,40 @@ public class OnlinePlayerMovement : MonoBehaviour
             return;
         }
 
-        if (flag.Get(0)) MoveRight();
-        if (flag.Get(1)) MoveLeft();
-        if (flag.Get(2)) Jump();
+        Vector2 velocity = new Vector2();
+
+        if (flag.Get(0)) velocity += MoveRight();
+        if (flag.Get(1)) velocity += MoveLeft();
+        if (flag.Get(2)) velocity += Jump();
 
         receiveInputs = false;
+
+        rb.velocity = new Vector2(velocity.x, rb.velocity.y + velocity.y);
     }
 
-    private void MoveLeft()
+    private Vector2 MoveLeft()
     {
-        rb.velocity = new Vector2(-speed, rb.velocity.y);
         sprite.flipX = true;
         anim.SetInteger("Animation", 1);
+        return new Vector2(-speed, 0);
     }
     
-    private void MoveRight()
+    private Vector2 MoveRight()
     {
-        rb.velocity = new Vector2(speed, rb.velocity.y);
         sprite.flipX = false;
         anim.SetInteger("Animation", 1);
+        return new Vector2(speed, 0);
     }
 
-    private void Jump() 
+    private Vector2 Jump() 
     { 
-        rb.velocity = new Vector2(0, jumpForce);
         anim.SetInteger("Animation", 2);
+        return new Vector2(0, jumpForce);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "LocalPlayer")
-        {
+        if (collision.gameObject.tag.Equals("LocalPlayer"))
             Physics.IgnoreCollision(collision.collider, collider);
-        }
     }
 }

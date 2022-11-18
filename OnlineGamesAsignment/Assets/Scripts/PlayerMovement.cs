@@ -5,26 +5,34 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Placement")]
     [SerializeField] private Transform spawnpoint;
-    SpriteRenderer sprite;
-    Animator anim;
 
     [Header("Physics")]
-    [SerializeField] float speed = 50;
-    [SerializeField] float acceleration = 1;
-    [SerializeField] float jumpForce = 50;
+    [SerializeField] float speed;
+    [SerializeField] float jumpForce;
 
+    // Private
     private StreamFlag flag = new StreamFlag(0);
-    private MemoryStream stream = new MemoryStream();
-    bool ground = false;
-    Rigidbody rb;
-    Collider collider;
+    private bool ground = false;
+    private Rigidbody rb;
+    private Collider collider;
+    private SpriteRenderer sprite;
+    private Animator anim;
 
-    private Serializer serializer = new Serializer();
-
-    private void Awake()
+    private void Start()
     {
         transform.position = spawnpoint.position;
+        rb = GetComponent<Rigidbody>();
+        anim = GetComponent<Animator>();
+        sprite = GetComponent<SpriteRenderer>();
+        collider = GetComponent<Collider>();
+    }
+
+    private void Update()
+    {
+        flag.Clear();
+        UpdateLogic();
     }
 
     public bool IsAnyInputActive()
@@ -37,74 +45,79 @@ public class PlayerMovement : MonoBehaviour
         return flag.flag;
     }
 
-    private void Start()
+    private void UpdateLogic()
     {
-        rb = GetComponent<Rigidbody>();
-        anim = GetComponent<Animator>();
-        sprite = GetComponent<SpriteRenderer>();
-        collider = GetComponent<Collider>();
+        Vector2 velocity = new Vector2();
+
+        velocity += Movement();
+        velocity += Jump();
+
+        UpdateAnimations(velocity);
+
+        rb.velocity = new Vector2(velocity.x, rb.velocity.y + velocity.y );
     }
 
-    private void Update()
+    private Vector2 Movement()
     {
-        flag.Clear();
-        PlayerMove();
+        Vector2 velocity = new Vector2(0, 0);
+
+        if (Input.GetKey(KeyCode.A)) velocity.x -= speed;
+
+        if (Input.GetKey(KeyCode.D)) velocity.x += speed;
+
+        return velocity;
     }
 
-    private void PlayerMove()
+    private Vector2 Jump()
     {
-        var horizontalInput = Input.GetAxisRaw("Horizontal");
-        rb.velocity = new Vector2(horizontalInput * speed, rb.velocity.y);
-        if (rb.velocity.x > 0 && rb.velocity.y <= 0.1 && ground)
+        Vector2 velocity = new Vector2(0, 0);
+
+        if (ground && Input.GetKey(KeyCode.Space))
+        {
+            ground = false;
+            flag.Set(2, true);
+            velocity.y += jumpForce;
+        }
+
+        return velocity;
+    }
+
+    private void UpdateAnimations(Vector2 velocity)
+    {
+        if (velocity.x > 0 && velocity.y <= 0.1 && ground)
         {
             sprite.flipX = false;
             anim.SetInteger("Animation", 1);
             flag.Set(0, true);
         }
-
-        else if (rb.velocity.x < 0 && rb.velocity.y <= 0.1 && ground)
+        else if (velocity.x < 0 && velocity.y <= 0.1 && ground)
         {
             sprite.flipX = true;
             anim.SetInteger("Animation", 1);
             flag.Set(1, true);
         }
-
-        else if (rb.velocity.x == 0)
+        else if (velocity.x == 0)
         {
             anim.SetInteger("Animation", 0);
         }
-
-        else if (rb.velocity.y > 0 && !ground)
+        else if (velocity.y > 0 && !ground)
         {
             anim.SetInteger("Animation", 2);
         }
-
-        if (Input.GetKey(KeyCode.Space) && ground)
-        {
-            flag.Set(2, true);
-            Jump();
-        }
-    }
-
-    private void Jump() => rb.velocity = new Vector2(0, jumpForce);
-
-    private void OnCollisionStay(Collision collision)
-    {
-        if (collision.collider.tag == "Ground")
-            ground = true;
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.collider.tag == "Ground")
-            ground = false;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "OnlinePlayer")
-        {
+        if (collision.collider.tag.Equals("Ground"))
+            ground = true;
+
+        if (collision.gameObject.tag.Equals("OnlinePlayer"))
             Physics.IgnoreCollision(collision.collider, collider);
-        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.collider.tag.Equals("Ground"))
+            ground = false;
     }
 }

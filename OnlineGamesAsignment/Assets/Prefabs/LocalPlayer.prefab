@@ -99,10 +99,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnpoint: {fileID: 8039450701735286520, guid: ff8c95ab3a3ed4140ad0e0f39de82593, type: 3}
-  speed: 5
-  acceleration: 1
-  jumpForce: 5
-  serializer: {fileID: 0}
+  speed: 7
+  jumpForce: 6
 --- !u!65 &6823275868626177208
 BoxCollider:
   m_ObjectHideFlags: 0
