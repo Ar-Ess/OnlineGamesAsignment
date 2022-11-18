@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4824749878826672944}
   - component: {fileID: 4824749878826672947}
+  - component: {fileID: 7364786355550635379}
   - component: {fileID: 4824749878826672957}
   - component: {fileID: 4824749878826672956}
   - component: {fileID: 4824749878826672959}
-  - component: {fileID: 7364786355550635379}
   m_Layer: 0
   m_Name: OnlinePlayer
   m_TagString: OnlinePLayer
@@ -86,6 +86,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &7364786355550635379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4824749878826672958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b0a6b5c17186ea41a53a84d72a71eed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnpoint: {fileID: 2355364520980246248, guid: 450a0646a5e586549ab56a848762df11, type: 3}
+  speed: 7
+  jumpForce: 6
 --- !u!65 &4824749878826672957
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -134,19 +149,3 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &7364786355550635379
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4824749878826672958}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b0a6b5c17186ea41a53a84d72a71eed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spawnpoint: {fileID: 2355364520980246248, guid: 450a0646a5e586549ab56a848762df11, type: 3}
-  speed: 5
-  acceleration: 1
-  jumpForce: 6

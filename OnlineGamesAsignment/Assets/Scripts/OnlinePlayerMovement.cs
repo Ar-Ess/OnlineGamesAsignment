@@ -57,6 +57,8 @@ public class OnlinePlayerMovement : MonoBehaviour
         receiveInputs = false;
 
         rb.velocity = new Vector2(velocity.x, rb.velocity.y + velocity.y);
+
+        flag.Clear();
     }
 
     private Vector2 MoveLeft()
