@@ -18,7 +18,7 @@ public class Serializer : MonoBehaviour
         BinaryReader reader = new BinaryReader(stream);
         stream.Seek(0, SeekOrigin.Begin);
         uint rcvUint = reader.ReadUInt16();
-        Debug.Log("string" + rcvUint.ToString());
+        //Debug.Log("string" + rcvUint.ToString());
         return rcvUint;
     }
 }
