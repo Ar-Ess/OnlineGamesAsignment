@@ -53,6 +53,7 @@ public class OnlinePlayerMovement : MonoBehaviour
         if (flag.Get(0)) velocity += MoveRight();
         if (flag.Get(1)) velocity += MoveLeft();
         if (flag.Get(2)) velocity += Jump();
+        if (flag.Get(3)) rb.velocity = new Vector2(0.0f, rb.velocity.y);
 
         rb.velocity = new Vector2(velocity.x, rb.velocity.y + velocity.y);
 

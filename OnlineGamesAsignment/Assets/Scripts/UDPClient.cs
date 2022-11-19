@@ -92,8 +92,16 @@ public class UDPClient : MonoBehaviour
 
                 clientSocket.ReceiveFrom(buffer, ref ip);
                 recvStream = new MemoryStream(buffer);
-                uint recUint = serializer.Deserialize(recvStream);
-                player.movement.SetFlag(recUint);
+                //uint recUint = serializer.Deserialize(recvStream);
+                //player.movement.SetFlag(recUint);
+                switch (serializer.CheckDataType(recvStream))
+                {
+                    case DataType.INPUT_FLAG:
+                        player.movement.SetFlag(serializer.DeserializeFlag(recvStream));
+                        break;
+                    case DataType.WORLD_CHECK:
+                        break;
+                }
                 recvStream.Flush();
                 recvStream.Dispose();
             }
@@ -105,14 +113,34 @@ public class UDPClient : MonoBehaviour
         while (true)
         {
             if (!localPlayer) continue;
-            if (!localPlayer.IsAnyInputActive()) continue;
 
-            clientSocket.SendTo(serializer.Serialize(localPlayer.GetFlag()).GetBuffer(), ep);
-            localPlayer.ClearFlag();
+            //if (!localPlayer.IsAnyInputActive()) continue;
+
+            //clientSocket.SendTo(serializer.Serialize(localPlayer.GetFlag()).GetBuffer(), ep);
+            //localPlayer.ClearFlag();
+
+            if (localPlayer.IsAnyInputActive())
+            {
+                clientSocket.SendTo(serializer.SerializeFlag(localPlayer.GetFlag()).GetBuffer(), ep);
+
+                localPlayer.ClearFlag();
+            } 
+
+            //if(localPlayer.IsSendingWorldCheck())
+            //{
+            //    foreach (OnlinePlayer player in clientsUDP)
+            //    {
+            //        if (!player.built) continue;
+            //        if (localPlayer.GetWorldCheck() == null) continue;
+            //        serverSocket.SendTo(serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()).GetBuffer(), player.ep);
+
+            //    }
+
+            //    localPlayer.ClearWorldCheckVector();
+            //}
         }
 
         snd.Abort();
-
     }
 
     public void JoinServer()

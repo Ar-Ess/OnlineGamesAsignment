@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -11,6 +12,8 @@ public class PlayerMovement : MonoBehaviour
     [Header("Physics")]
     [SerializeField] float speed;
     [SerializeField] float jumpForce;
+    [Header("Time")]
+    [SerializeField] float timeInterval = 1.0f;
 
     // Private
     private StreamFlag flag = new StreamFlag(0);
@@ -19,6 +22,8 @@ public class PlayerMovement : MonoBehaviour
     private Collider collider;
     private SpriteRenderer sprite;
     private Animator anim;
+    private float timer = 0;
+    private Vector2? worldCheckVector = null;
 
     private void Start()
     {
@@ -33,6 +38,32 @@ public class PlayerMovement : MonoBehaviour
     {
         flag.Clear();
         UpdateLogic();
+        //UpdateWorldCheck();
+    }
+
+    private void UpdateWorldCheck()
+    {
+        if (worldCheckVector != null) return;
+
+        if (timer < timeInterval) timer += Time.deltaTime;
+        else worldCheckVector = new Vector2(transform.position.x, transform.position.y);
+    }
+
+    public bool IsSendingWorldCheck()
+    {
+        return (worldCheckVector != null);
+    }
+
+    public void ClearWorldCheckVector()
+    {
+        worldCheckVector = null;
+        timer = 0.0f;
+    }
+
+    public Vector2? GetWorldCheck()
+    {
+        
+        return worldCheckVector;
     }
 
     public bool IsAnyInputActive()
@@ -70,6 +101,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKey(KeyCode.D)) velocity.x += speed;
 
+        if (Input.GetKeyUp(KeyCode.A) ||Input.GetKeyUp(KeyCode.D)) flag.Set(3, true);
+
         return velocity;
     }
 
@@ -77,7 +110,7 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector2 velocity = new Vector2(0, 0);
 
-        if (ground && Input.GetKey(KeyCode.Space))
+        if (ground && Input.GetKeyDown(KeyCode.Space))
         {
             ground = false;
             flag.Set(2, true);

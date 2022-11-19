@@ -99,18 +99,42 @@ public class UDPServer : MonoBehaviour
         while (true)
         {
             if (!localPlayer) continue;
-            if (!localPlayer.IsAnyInputActive()) continue;
+            //if (!localPlayer.IsAnyInputActive()) continue;
 
-            foreach (OnlinePlayer player in clientsUDP)
+            //foreach (OnlinePlayer player in clientsUDP)
+            //{
+            //    if (!player.built) continue;
+            //    serverSocket.SendTo(serializer.Serialize(localPlayer.GetFlag()).GetBuffer(), player.ep);
+
+            //}
+
+            //localPlayer.ClearFlag();
+
+            if (localPlayer.IsAnyInputActive())
             {
-                if (!player.built) continue;
-                serverSocket.SendTo(serializer.Serialize(localPlayer.GetFlag()).GetBuffer(), player.ep);
-                
-            }
+                foreach (OnlinePlayer player in clientsUDP)
+                {
+                    if (!player.built) continue;
+                    serverSocket.SendTo(serializer.SerializeFlag(localPlayer.GetFlag()).GetBuffer(), player.ep);
 
-            localPlayer.ClearFlag();
+                }
+
+                localPlayer.ClearFlag();
+            } 
+
+            //if(localPlayer.IsSendingWorldCheck())
+            //{
+            //    foreach (OnlinePlayer player in clientsUDP)
+            //    {
+            //        if (!player.built) continue;
+            //        if (localPlayer.GetWorldCheck() == null) continue;
+            //        serverSocket.SendTo(serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()).GetBuffer(), player.ep);
+
+            //    }
+
+            //    localPlayer.ClearWorldCheckVector();
+            //}
         }
-
 
         snd.Abort();
     }
@@ -127,10 +151,17 @@ public class UDPServer : MonoBehaviour
 
                 serverSocket.ReceiveFrom(buffer, ref ip);
                 recvStream = new MemoryStream(buffer);
-                uint recUint = serializer.Deserialize(recvStream);
+                //uint recUint = serializer.Deserialize(recvStream);
+                //player.movement.SetFlag(recUint);
                 //Debug.Log("Received message from: " + remote.ToString());
-                //Debug.Log("Message: " + recUint);
-                player.movement.SetFlag(recUint);
+                switch (serializer.CheckDataType(recvStream))
+                {
+                    case DataType.INPUT_FLAG:
+                        player.movement.SetFlag(serializer.DeserializeFlag(recvStream));
+                        break;
+                    case DataType.WORLD_CHECK:
+                        break;
+                }
                 recvStream.Flush();
                 recvStream.Dispose();
                 
