@@ -105,8 +105,12 @@ public class UDPServer : MonoBehaviour
             {
                 if (!player.built) continue;
                 serverSocket.SendTo(serializer.Serialize(localPlayer.GetFlag()).GetBuffer(), player.ep);
+                
             }
+
+            localPlayer.ClearFlag();
         }
+
 
         snd.Abort();
     }

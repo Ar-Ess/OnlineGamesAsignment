@@ -30,7 +30,7 @@ public class OnlinePlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (receiveInputs) UpdateLogic();
+        if(receiveInputs) UpdateLogic();
     }
 
     public void SetFlag(uint uflag)
@@ -48,13 +48,11 @@ public class OnlinePlayerMovement : MonoBehaviour
             return;
         }
 
-        Vector2 velocity = new Vector2();
+        Vector2 velocity = new Vector2(0,0);
 
         if (flag.Get(0)) velocity += MoveRight();
         if (flag.Get(1)) velocity += MoveLeft();
         if (flag.Get(2)) velocity += Jump();
-
-        receiveInputs = false;
 
         rb.velocity = new Vector2(velocity.x, rb.velocity.y + velocity.y);
 

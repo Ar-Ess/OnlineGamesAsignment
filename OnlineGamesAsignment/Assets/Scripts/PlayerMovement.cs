@@ -45,6 +45,11 @@ public class PlayerMovement : MonoBehaviour
         return flag.flag;
     }
 
+    public void ClearFlag()
+    {
+        flag.Clear();
+    }
+
     private void UpdateLogic()
     {
         Vector2 velocity = new Vector2();

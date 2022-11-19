@@ -93,8 +93,6 @@ public class UDPClient : MonoBehaviour
                 clientSocket.ReceiveFrom(buffer, ref ip);
                 recvStream = new MemoryStream(buffer);
                 uint recUint = serializer.Deserialize(recvStream);
-                //Debug.Log("Received message from: " + remote.ToString());
-                Debug.Log("Message: " + recUint);
                 player.movement.SetFlag(recUint);
                 recvStream.Flush();
                 recvStream.Dispose();
@@ -110,6 +108,7 @@ public class UDPClient : MonoBehaviour
             if (!localPlayer.IsAnyInputActive()) continue;
 
             clientSocket.SendTo(serializer.Serialize(localPlayer.GetFlag()).GetBuffer(), ep);
+            localPlayer.ClearFlag();
         }
 
         snd.Abort();
