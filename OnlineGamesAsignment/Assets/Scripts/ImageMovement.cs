@@ -30,13 +30,13 @@ public class ImageMovement : MonoBehaviour
 
     private IEnumerator MoveImage()
     {
-        while (Vector3.Distance(startPosition,transform.position) < distance)
+        float elapsedTime = 0.0f;
+        while (elapsedTime < interval)
         {
-            transform.position += new Vector3(velX *Time.deltaTime, velY * Time.deltaTime, velZ * Time.deltaTime);
+            transform.position = Vector3.Lerp(startPosition, endPosition, Mathf.SmoothStep(0.0f, 1.0f, elapsedTime));
+            elapsedTime += Time.deltaTime / interval;
             yield return null;
         }
-
         transform.position = endPosition;
-        
     }
 }

@@ -16,14 +16,13 @@ public class UDPServer : MonoBehaviour
     Thread thr;
     Thread snd;
     Thread rcv;
-    [SerializeField] int maxPlayers;
+    int maxPlayers = 2;
     string stringData = string.Empty;
     PlayerMovement localPlayer = null;
     MemoryStream recvStream = new MemoryStream();
     private Serializer serializer = new Serializer();
     [SerializeField] private GameObject onlinePlayer;
     private List<OnlinePlayer> clientsUDP = new List<OnlinePlayer>();
-
     private UDPServer _instance;
     public UDPServer Instance { get { return _instance; } }
 
@@ -53,6 +52,11 @@ public class UDPServer : MonoBehaviour
         {
             localPlayer = GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerMovement>();
         }
+    }
+
+    public void SetNumPlayers()
+    {
+      
     }
 
     public void SetupServer()
