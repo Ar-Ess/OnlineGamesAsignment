@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
 public class OnlinePlayerMovement : MonoBehaviour
 {
     [Header("Placement")]
@@ -19,6 +21,7 @@ public class OnlinePlayerMovement : MonoBehaviour
     private Collider collider;
     private SpriteRenderer sprite;
     private Animator anim;
+    private Vector2? receivePosition = null;
 
     private void Start()
     {
@@ -32,6 +35,12 @@ public class OnlinePlayerMovement : MonoBehaviour
     private void Update()
     {
         if(receiveInputs) UpdateLogic();
+
+        if(receivePosition != null)
+        {
+            transform.position = new Vector3(receivePosition.GetValueOrDefault().x, receivePosition.GetValueOrDefault().y, transform.position.z);
+            receivePosition = null;
+        }
     }
 
     public void SetFlag(uint uflag)
@@ -90,6 +99,6 @@ public class OnlinePlayerMovement : MonoBehaviour
 
     public void SetPosition(Vector2 vector2)
     {
-        transform.position = new Vector3(vector2.x,vector2.y,transform.position.z);
+        receivePosition = vector2;
     }
 }
