@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 0955e4a25f29a7a40bc7475297252447
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - 'Final Fantasy '
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: d22ae810e5892634783f1ed0581dda7f, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
