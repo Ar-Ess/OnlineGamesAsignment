@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -85,5 +86,10 @@ public class OnlinePlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.tag.Equals("LocalPlayer"))
             Physics.IgnoreCollision(collision.collider, collider);
+    }
+
+    public void SetPosition(Vector2 vector2)
+    {
+        transform.position = new Vector3(vector2.x,vector2.y,transform.position.z);
     }
 }

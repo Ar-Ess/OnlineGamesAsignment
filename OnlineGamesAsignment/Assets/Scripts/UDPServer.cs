@@ -120,20 +120,20 @@ public class UDPServer : MonoBehaviour
                 }
 
                 localPlayer.ClearFlag();
-            } 
+            }
 
-            //if(localPlayer.IsSendingWorldCheck())
-            //{
-            //    foreach (OnlinePlayer player in clientsUDP)
-            //    {
-            //        if (!player.built) continue;
-            //        if (localPlayer.GetWorldCheck() == null) continue;
-            //        serverSocket.SendTo(serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()).GetBuffer(), player.ep);
+            if (localPlayer.IsSendingWorldCheck())
+            {
+                foreach (OnlinePlayer player in clientsUDP)
+                {
+                    if (!player.built) continue;
+                    if (localPlayer.GetWorldCheck() == null) continue;
+                    serverSocket.SendTo(serializer.SerializeVector(localPlayer.GetWorldCheck().GetValueOrDefault()).GetBuffer(), player.ep);
 
-            //    }
+                }
 
-            //    localPlayer.ClearWorldCheckVector();
-            //}
+                localPlayer.ClearWorldCheckVector();
+            }
         }
 
         snd.Abort();
@@ -160,6 +160,7 @@ public class UDPServer : MonoBehaviour
                         player.movement.SetFlag(serializer.DeserializeFlag(recvStream));
                         break;
                     case DataType.WORLD_CHECK:
+                        player.movement.SetPosition(serializer.DeserializeVector(recvStream));
                         break;
                 }
                 recvStream.Flush();
