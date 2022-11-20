@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,16 +31,24 @@ public class LobbySceneLogic : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        UpdateUI();
-    }
-
-    private void UpdateUI()
-    {
         if (playersInfo == null) return;
-
         int numPlayers = 0, maxPlayers = 0;
         playersInfo.GetPlayersInfo(ref numPlayers, ref maxPlayers);
-        if (Input.GetKey(KeyCode.G)) numPlayers++;
+
+        UpdateStartGame(numPlayers, maxPlayers);
+        UpdateUI(numPlayers, maxPlayers);
+    }
+
+    private void UpdateStartGame(int numPlayers, int maxPlayers)
+    {
+        if (numPlayers == maxPlayers && Input.GetKeyDown(KeyCode.Return))
+        {
+            SceneManagement.ChangeScene("Level1");
+        }
+    }
+
+    private void UpdateUI(int numPlayers, int maxPlayers)
+    {
         if (numPlayers != nPlayers)
         {
             joinText.SetActive((numPlayers == maxPlayers));
