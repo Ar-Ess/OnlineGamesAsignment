@@ -60,6 +60,13 @@ public class UDPClient : MonoBehaviour
         }
         if (connectToScene) ChangeScene("LobbyScene");
     }
+
+    public void GetPlayersInfo(ref int numberPlayers, ref int maximumPlayers)
+    {
+        numberPlayers = players.Count + 1;
+        maximumPlayers = 2;
+    }
+
     private void ConnectClient()
     {
         clientSocket.Connect(ep);

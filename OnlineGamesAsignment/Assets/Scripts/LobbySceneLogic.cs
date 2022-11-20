@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,32 +9,63 @@ public class LobbySceneLogic : MonoBehaviour
     [SerializeField] private Text maxPlayersText;
     [SerializeField] private GameObject joinText;
     private GameObject obj;
+    private bool server = false;
 
     // Private
-    private UDPServer playersInfo = null;
+    private UDPServer serverPlayersInfo = null;
+    private UDPClient clientPlayersInfo = null;
     private int nPlayers;
 
     void Start()
     {
         Instantiate(localPlayer);
+        DontDestroyOnLoad(localPlayer);
+
         GameObject obj = GameObject.Find("UDPServer");
         if (obj != null)
         {
-            playersInfo = GameObject.Find("UDPServer").GetComponent<UDPServer>();
+            serverPlayersInfo = obj.GetComponent<UDPServer>();
             int maxPlayers = 0;
-            playersInfo.GetPlayersInfo(ref nPlayers, ref maxPlayers);
+            serverPlayersInfo.GetPlayersInfo(ref nPlayers, ref maxPlayers);
             maxPlayersText.text = "/ " + maxPlayers.ToString();
+            server = true;
+            return;
+        }
+
+        obj = GameObject.Find("UDPClient");
+        if (obj != null)
+        {
+            clientPlayersInfo = obj.GetComponent<UDPClient>();
+            int maxPlayers = 0;
+            clientPlayersInfo.GetPlayersInfo(ref nPlayers, ref maxPlayers);
+            maxPlayersText.text = "/ " + maxPlayers.ToString();
+            joinText.GetComponent<Text>().text = "ALL READY, WAITING HOST";
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (playersInfo == null) return;
+        if (server) UpdateServer();
+        else UpdateClient();
+    }
+
+    private void UpdateServer()
+    {
+        if (serverPlayersInfo == null) return;
         int numPlayers = 0, maxPlayers = 0;
-        playersInfo.GetPlayersInfo(ref numPlayers, ref maxPlayers);
+        serverPlayersInfo.GetPlayersInfo(ref numPlayers, ref maxPlayers);
 
         UpdateStartGame(numPlayers, maxPlayers);
+        UpdateUI(numPlayers, maxPlayers);
+    }
+
+    private void UpdateClient()
+    {
+        if (clientPlayersInfo == null) return;
+        int numPlayers = 0, maxPlayers = 0;
+        clientPlayersInfo.GetPlayersInfo(ref numPlayers, ref maxPlayers);
+
         UpdateUI(numPlayers, maxPlayers);
     }
 

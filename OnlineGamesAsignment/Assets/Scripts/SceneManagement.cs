@@ -10,6 +10,8 @@ public static class SceneManagement
             case "ClientConnectScene":
             case "ServerConnectScene":
             case "MainMenuScene":
+            case "Level1":
+            default:
                 SceneManager.LoadScene(scene);
                 break;
         }
