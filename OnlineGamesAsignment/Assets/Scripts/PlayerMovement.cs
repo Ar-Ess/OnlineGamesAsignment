@@ -39,6 +39,9 @@ public class PlayerMovement : MonoBehaviour
         flag.Clear();
         UpdateLogic();
         //UpdateWorldCheck();
+
+        
+
     }
 
     private void UpdateWorldCheck()
@@ -83,62 +86,48 @@ public class PlayerMovement : MonoBehaviour
 
     private void UpdateLogic()
     {
-        Vector2 velocity = new Vector2();
+        PlayerMove();
+        if (ground && Input.GetKeyDown(KeyCode.Space)) Jump();
 
-        velocity += Movement();
-        velocity += Jump();
-
-        UpdateAnimations(velocity);
-
-        rb.velocity = new Vector2(velocity.x, rb.velocity.y + velocity.y );
+        UpdateAnimations(); 
     }
 
-    private Vector2 Movement()
+    private void PlayerMove()
     {
-        Vector2 velocity = new Vector2(0, 0);
-
-        if (Input.GetKey(KeyCode.A)) velocity.x -= speed;
-
-        if (Input.GetKey(KeyCode.D)) velocity.x += speed;
-
-        if (Input.GetKeyUp(KeyCode.A) ||Input.GetKeyUp(KeyCode.D)) flag.Set(3, true);
-
-        return velocity;
+        var horizontalInput = Input.GetAxisRaw("Horizontal");
+        rb.velocity = new Vector2(horizontalInput * speed, rb.velocity.y);
     }
 
-    private Vector2 Jump()
+    private void Jump()
     {
-        Vector2 velocity = new Vector2(0, 0);
 
         if (ground && Input.GetKeyDown(KeyCode.Space))
         {
-            ground = false;
             flag.Set(2, true);
-            velocity.y += jumpForce;
+            rb.velocity = new Vector2(0, jumpForce);
         }
-
-        return velocity;
+   
     }
 
-    private void UpdateAnimations(Vector2 velocity)
+    private void UpdateAnimations()
     {
-        if (velocity.x > 0 && velocity.y <= 0.1 && ground)
+        if (rb.velocity.x > 0 && rb.velocity.y <= 0.1f && ground)
         {
             sprite.flipX = false;
             anim.SetInteger("Animation", 1);
             flag.Set(0, true);
         }
-        else if (velocity.x < 0 && velocity.y <= 0.1 && ground)
+        else if (rb.velocity.x < 0 && rb.velocity.y <= 0.1f && ground)
         {
             sprite.flipX = true;
             anim.SetInteger("Animation", 1);
             flag.Set(1, true);
         }
-        else if (velocity.x == 0)
+        else if (rb.velocity.x == 0)
         {
             anim.SetInteger("Animation", 0);
         }
-        else if (velocity.y > 0 && !ground)
+        else if (rb.velocity.y > 0 && !ground)
         {
             anim.SetInteger("Animation", 2);
         }
@@ -155,7 +144,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.collider.tag.Equals("Ground"))
+        if (collision.collider.tag == "Ground")
             ground = false;
     }
 }
