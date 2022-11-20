@@ -6,22 +6,26 @@ using System.Threading;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine.UI;
 
 public class UDPServer : MonoBehaviour
 {
-    byte[] data = new byte[1024];
-    IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 5554);
-    Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-    EndPoint remote;
-    Thread thr;
-    Thread snd;
-    Thread rcv;
-    int maxPlayers = 2;
-    string stringData = string.Empty;
-    PlayerMovement localPlayer = null;
-    MemoryStream recvStream = new MemoryStream();
-    private Serializer serializer = new Serializer();
+    [SerializeField] private Dropdown dropdown;
     [SerializeField] private GameObject onlinePlayer;
+
+    // Private
+    private byte[] data = new byte[1024];
+    private IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 5554);
+    private Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+    private EndPoint remote;
+    private Thread thr;
+    private Thread snd;
+    private Thread rcv;
+    private int maxPlayers = 2;
+    private string stringData = string.Empty;
+    private PlayerMovement localPlayer = null;
+    private MemoryStream recvStream = new MemoryStream();
+    private Serializer serializer = new Serializer();
     private List<OnlinePlayer> clientsUDP = new List<OnlinePlayer>();
     private UDPServer _instance;
     public UDPServer Instance { get { return _instance; } }
@@ -52,6 +56,12 @@ public class UDPServer : MonoBehaviour
         LookForLocalPlayerInstance();
     }
 
+    public void GetPlayersInfo(ref int numberPlayers, ref int maximumPlayers)
+    {
+        numberPlayers = clientsUDP.Count + 1;
+        maximumPlayers = maxPlayers;
+    }
+
     private void LookForLocalPlayerInstance()
     {
         if (localPlayer == null)
@@ -63,7 +73,7 @@ public class UDPServer : MonoBehaviour
 
     public void SetNumPlayers()
     {
-      
+        maxPlayers = dropdown.value + 2;
     }
 
     public void SetupServer()
@@ -78,6 +88,7 @@ public class UDPServer : MonoBehaviour
         rcv = new Thread(new ThreadStart(Receive));
         thr.Start();
     }
+
     private void Listen()
     {
         int numPlayers = 1;

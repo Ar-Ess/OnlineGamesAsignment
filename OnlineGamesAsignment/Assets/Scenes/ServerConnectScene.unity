@@ -970,7 +970,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1448313024}
         m_TargetAssemblyTypeName: UDPServer, Assembly-CSharp
         m_MethodName: SetNumPlayers
-        m_Mode: 3
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2384,5 +2384,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6288909075645034861, guid: eda4d3e2ff098854d9677993e78d6c6d, type: 3}
+      propertyPath: dropdown
+      value: 
+      objectReference: {fileID: 474762738}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eda4d3e2ff098854d9677993e78d6c6d, type: 3}
