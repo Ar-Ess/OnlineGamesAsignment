@@ -135,11 +135,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.collider.tag.Equals("Ground"))
-            ground = true;
 
         if (collision.gameObject.tag.Equals("OnlinePlayer"))
             Physics.IgnoreCollision(collision.collider, collider);
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.collider.tag.Equals("Ground"))
+            ground = true;
     }
 
     private void OnCollisionExit(Collision collision)

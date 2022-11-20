@@ -201,6 +201,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: lilypad (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 767560405411592640, guid: 14e5f71e80285e84c9b2c619cc7908ce, type: 3}
+      propertyPath: m_TagString
+      value: Ground
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 14e5f71e80285e84c9b2c619cc7908ce, type: 3}
 --- !u!1 &32906913 stripped
@@ -4105,6 +4109,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: lilypad (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 767560405411592640, guid: 14e5f71e80285e84c9b2c619cc7908ce, type: 3}
+      propertyPath: m_TagString
+      value: Ground
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 14e5f71e80285e84c9b2c619cc7908ce, type: 3}
 --- !u!1 &756453876
@@ -7944,6 +7952,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: lilypad (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 767560405411592640, guid: 14e5f71e80285e84c9b2c619cc7908ce, type: 3}
+      propertyPath: m_TagString
+      value: Ground
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 14e5f71e80285e84c9b2c619cc7908ce, type: 3}
 --- !u!4 &1517159759 stripped
@@ -10763,6 +10775,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localPlayer: {fileID: 6823275868626177215, guid: 937129c9e72651d47a4ae967463967c1, type: 3}
+  numPlayersText: {fileID: 0}
+  maxPlayersText: {fileID: 0}
+  joinText: {fileID: 0}
 --- !u!4 &2065594816
 Transform:
   m_ObjectHideFlags: 0
