@@ -48,9 +48,16 @@ public class UDPServer : MonoBehaviour
                 if (!player.built) player.SetOnlinePlayer(Instantiate(onlinePlayer));
             }
         }
+
+        LookForLocalPlayerInstance();
+    }
+
+    private void LookForLocalPlayerInstance()
+    {
         if (localPlayer == null)
         {
-            localPlayer = GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerMovement>();
+            GameObject obj = GameObject.FindGameObjectWithTag("LocalPlayer");
+            if (obj != null) localPlayer = obj.GetComponent<PlayerMovement>();
         }
     }
 
