@@ -17,7 +17,6 @@ public class UDPServer : MonoBehaviour
     private byte[] data = new byte[1024];
     private IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 5554);
     private Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-    private EndPoint remote;
     private Thread thr;
     private Thread snd;
     private Thread rcv;
@@ -93,26 +92,39 @@ public class UDPServer : MonoBehaviour
     {
         int numPlayers = 1;
 
-        while(numPlayers < maxPlayers)
+        while (numPlayers < maxPlayers)
         {
-            IPEndPoint clientSocket = new IPEndPoint(IPAddress.Any, 0);
-            Debug.Log(clientSocket.Address);
-            remote = clientSocket;
-            serverSocket.ReceiveFrom(data, ref remote);
-            stringData = Encoding.ASCII.GetString(data);
+            EndPoint clientSocket = new IPEndPoint(IPAddress.Any, 0);
+            serverSocket.ReceiveFrom(data, ref clientSocket);
 
-            if (data != null)
+            stringData = Encoding.ASCII.GetString(data);
+            
+            if (data == null) continue;
+
+            numPlayers++;
+            // If only 2 players (Server & Client)
+            if (clientsUDP.Count == 2)
             {
-                numPlayers++;
-                clientsUDP.Add(new OnlinePlayer((IPEndPoint)remote));
+                clientsUDP.Add(new OnlinePlayer((IPEndPoint)clientSocket));
+                rcv.Start();
+                snd.Start();
+                continue;
             }
 
-            Debug.Log("Message received from {0}: " + remote.ToString());
-            Debug.Log("Message: " + stringData);
-            rcv.Start();
-            snd.Start();
+            // If more than 2 players (Server & Clients)
+            foreach (OnlinePlayer oP in clientsUDP)
+            {
+                byte[] newPlayerEP = new byte[1024];
+                newPlayerEP = Encoding.ASCII.GetBytes(clientSocket.ToString());
+                serverSocket.SendTo(newPlayerEP, oP.ep);
+            }
+
+            clientsUDP.Add(new OnlinePlayer((IPEndPoint)clientSocket));
+
+            //Debug.Log("Message received from {0}: " + remote.ToString());
+            //Debug.Log("Message: " + stringData);
         }
-         
+
         thr.Abort();
     }
 
@@ -189,7 +201,6 @@ public class UDPServer : MonoBehaviour
                 recvStream.Dispose();
                 
             }
-            
         }
         
     }

@@ -13,6 +13,7 @@ public class UDPClient : MonoBehaviour
     private static Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
     EndPoint ep;
     bool connectToScene = false;
+    bool onLobby = false;
     private string serverIP;
     string stringData = "Hello";
     byte[] data = new byte[1024];
@@ -26,7 +27,6 @@ public class UDPClient : MonoBehaviour
     private Serializer serializer = new Serializer();
     [SerializeField] private GameObject onlinePlayer;
     private List<OnlinePlayer> players = new List<OnlinePlayer>();
-
 
     private UDPClient _instance;
     public UDPClient Instance { get { return _instance; } }
@@ -44,6 +44,11 @@ public class UDPClient : MonoBehaviour
     }
 
     private void Update()
+    {
+        if (!onLobby) UpdateJoinServer();
+    }
+
+    private void UpdateJoinServer()
     {
         if (true) //TODO: Keep track of amount of players built and do a if here to check if all builts done. so program does not have to iterate foreach every time
         {
@@ -162,7 +167,8 @@ public class UDPClient : MonoBehaviour
         {
             connectToScene = false;
             getPlayer = true;
-            players.Add(new OnlinePlayer((IPEndPoint)ep));
+            players.Add(new OnlinePlayer((IPEndPoint)ep, true));
+            onLobby = true;
         }
     }
 
@@ -180,6 +186,4 @@ public class UDPClient : MonoBehaviour
         if (clientSocket.Connected) clientSocket.Disconnect(false);
         clientSocket.Close();
     }
-
-
 }
