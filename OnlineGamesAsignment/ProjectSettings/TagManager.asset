@@ -8,6 +8,7 @@ TagManager:
   - LocalPlayer
   - OnlinePLayer
   - Wall
+  - Death
   layers:
   - Default
   - TransparentFX
