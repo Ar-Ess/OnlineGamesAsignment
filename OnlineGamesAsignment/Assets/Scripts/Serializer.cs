@@ -13,23 +13,23 @@ public enum DataType
 
 public static class Serializer
 {
-    public static MemoryStream Serialize(uint value, DataType type)
+    public static byte[] Serialize(uint value, DataType type)
     {
         MemoryStream stream = new MemoryStream();
         BinaryWriter writer = new BinaryWriter(stream);
         writer.Write((int)type);
         writer.Write(value);
-        return stream;
+        return stream.GetBuffer();
     }
 
-    public static MemoryStream Serialize(Vector2 vector2)
+    public static byte[] Serialize(Vector2 vector2)
     {
         MemoryStream stream = new MemoryStream();
         BinaryWriter writer = new BinaryWriter(stream);
         writer.Write((int)DataType.WORLD_CHECK);
         writer.Write(vector2.x);
         writer.Write(vector2.y);
-        return stream;
+        return stream.GetBuffer();
     }
 
     public class Deserialization

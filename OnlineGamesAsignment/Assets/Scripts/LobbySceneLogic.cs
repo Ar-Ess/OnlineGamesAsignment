@@ -26,6 +26,7 @@ public class LobbySceneLogic : MonoBehaviour
         {
             serverPlayersInfo = obj.GetComponent<UDPServer>();
             maxPlayersText.text = "/ " + serverPlayersInfo.MaxLobbyPlayers.ToString();
+            prevNumLobbyPlayers = serverPlayersInfo.NumLobbyPlayers;
             server = true;
             return;
         }
@@ -35,6 +36,7 @@ public class LobbySceneLogic : MonoBehaviour
         {
             clientPlayersInfo = obj.GetComponent<UDPClient>();
             maxPlayersText.text = "/ " + clientPlayersInfo.MaxLobbyPlayers.ToString();
+            prevNumLobbyPlayers = clientPlayersInfo.NumLobbyPlayers;
             joinText.GetComponent<Text>().text = "ALL READY, WAITING HOST";
         }
     }

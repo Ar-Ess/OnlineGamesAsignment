@@ -105,13 +105,14 @@ public class UDPClient : MonoBehaviour
     {
         while (true)
         {
-            foreach (OnlinePlayer player in players)
+            int size = players.Count;
+            for (int i = 0; i < size; ++i)
             {
+                OnlinePlayer player = players[i];
                 if (!player.built) continue;
 
-                EndPoint ip = player.ep;
                 byte[] buffer = new byte[1024];
-                clientSocket.ReceiveFrom(buffer, ref ip);
+                clientSocket.ReceiveFrom(buffer, ref serverEndPoint);
                 MemoryStream recvStream = new MemoryStream(buffer);
 
                 switch (Serializer.CheckDataType(recvStream))
@@ -140,13 +141,13 @@ public class UDPClient : MonoBehaviour
 
             if (localPlayer.IsAnyInputActive())
             {
-                clientSocket.SendTo(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG).GetBuffer(), serverEndPoint);
+                clientSocket.SendTo(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG), serverEndPoint);
                 localPlayer.ClearFlag();
             }
 
             if (localPlayer.IsSendingWorldCheck() && localPlayer.GetWorldCheck() != null)
             {
-                clientSocket.SendTo(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()).GetBuffer(), serverEndPoint);
+                clientSocket.SendTo(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()), serverEndPoint);
                 localPlayer.ClearWorldCheckVector();
             }
         }

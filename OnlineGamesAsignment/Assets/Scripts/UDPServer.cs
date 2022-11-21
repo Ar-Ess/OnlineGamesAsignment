@@ -58,8 +58,11 @@ public class UDPServer : MonoBehaviour
         
         foreach (OnlinePlayer player in clients)
         {
-            if (!player.built) 
+            if (!player.built)
+            {
                 player.SetOnlinePlayer(Instantiate(onlinePlayer));
+                //serverSocket.SendTo(Serializer.Serialize(maxLobbyPlayers, DataType.LOBBY_MAX), player.ep);
+            }
         }
     }
 
@@ -82,13 +85,13 @@ public class UDPServer : MonoBehaviour
 
         while (numPlayers < maxLobbyPlayers)
         {
-            EndPoint clientSocket = new IPEndPoint(IPAddress.Any, 0);
+            EndPoint clientEndPoint = new IPEndPoint(IPAddress.Any, 0);
             byte[] data = new byte[1024];
-            serverSocket.ReceiveFrom(data, ref clientSocket);
-            if (data == null) continue;
+            int received = serverSocket.ReceiveFrom(data, ref clientEndPoint);
+            if (received == 0) continue;
 
             numPlayers++;
-            AddNewClient(clientSocket);
+            AddNewClient(clientEndPoint);
 
             if (numPlayers > 2) continue;
             rcv.Start();
@@ -113,7 +116,7 @@ public class UDPServer : MonoBehaviour
                 foreach (OnlinePlayer player in clients)
                 {
                     if (!player.built) continue;
-                    serverSocket.SendTo(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG).GetBuffer(), player.ep);
+                    serverSocket.SendTo(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG), player.ep);
 
                 }
 
@@ -125,7 +128,7 @@ public class UDPServer : MonoBehaviour
                 foreach (OnlinePlayer player in clients)
                 {
                     if (!player.built) continue;
-                    serverSocket.SendTo(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()).GetBuffer(), player.ep);
+                    serverSocket.SendTo(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()), player.ep);
                 }
                 localPlayer.ClearWorldCheckVector();
             }
