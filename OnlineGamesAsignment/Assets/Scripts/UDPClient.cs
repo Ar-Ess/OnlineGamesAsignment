@@ -10,85 +10,95 @@ using System.IO;
 
 public class UDPClient : MonoBehaviour
 {
-    private static Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-    EndPoint ep;
-    bool connectToScene = false;
-    bool onLobby = false;
-    private string serverIP;
-    string stringData = "Hello";
-    byte[] data = new byte[1024];
-    Thread thr;
-    Thread snd;
-    Thread rcv;
-    public InputField field;
-    private PlayerMovement localPlayer = null;
-    MemoryStream recvStream = new MemoryStream();
-    bool getPlayer = false;
-    private Serializer serializer = new Serializer();
     [SerializeField] private GameObject onlinePlayer;
-    private List<OnlinePlayer> players = new List<OnlinePlayer>();
-
-    private UDPClient _instance;
     public UDPClient Instance { get { return _instance; } }
+    public uint MaxLobbyPlayers { get { return maxLobbyPlayers; } }
+    public uint NumLobbyPlayers { get { return (uint)players.Count + 1; } }
+
+    // Private
+    private Socket clientSocket;
+    private Thread thr, snd, rcv;
+    private uint maxLobbyPlayers = 1;
+    private PlayerMovement localPlayer = null;
+    private List<OnlinePlayer> players = new List<OnlinePlayer>();
+    private UDPClient _instance;
+    private EndPoint serverEndPoint = null;
+    // BuildPlayer (0) | JoinServer (1) | CreateNewPlayer (2) |
+    private StreamFlag callbacks = new StreamFlag(0); 
 
     private void Awake()
     {
         if (_instance != null && _instance != this)
-        {
             Destroy(this.gameObject);
-        }
-
         else _instance = this;
-
         DontDestroyOnLoad(this);
+
+        clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        thr = new Thread(new ThreadStart(ConnectClient));
+        rcv = new Thread(new ThreadStart(Receive));
+        snd = new Thread(new ThreadStart(Send));
     }
 
     private void Update()
     {
-        if (!onLobby) UpdateJoinServer();
+        AddPlayerLogic(); // Ha d'estar justament aquí. A sobre de tot. No moure.
+
+        JoinServerLogic();
+        LookForLocalPlayerInstance(); //TODO: Only in lobby
+        BuildPlayers();
     }
 
-    private void UpdateJoinServer()
+    private void AddPlayerLogic()
     {
-        if (true) //TODO: Keep track of amount of players built and do a if here to check if all builts done. so program does not have to iterate foreach every time
-        {
-            foreach (OnlinePlayer player in players)
-            {
-                if (!player.built) player.SetOnlinePlayer(Instantiate(onlinePlayer));
-            }
-        }
+        if (!callbacks.Get(2)) return;
+        callbacks.Set(2, false);
 
-        if (getPlayer && localPlayer == null)
-        {
-            localPlayer = GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerMovement>();
-            getPlayer = false;
-        }
-        if (connectToScene) ChangeScene("LobbyScene");
+        players.Add(new OnlinePlayer((IPEndPoint)serverEndPoint, players.Count == 0));
+        callbacks.Set(0, true);
     }
 
-    public void GetPlayersInfo(ref int numberPlayers, ref int maximumPlayers)
+    private void JoinServerLogic()
     {
-        numberPlayers = players.Count + 1;
-        maximumPlayers = 2;
+        if (!callbacks.Get(1)) return;
+        callbacks.Set(1, false);
+
+        ChangeScene("LobbyScene");
+        AddNewPlayer();
+    }
+
+    private void LookForLocalPlayerInstance()
+    {
+        if (localPlayer != null) return;
+
+        GameObject obj = GameObject.FindGameObjectWithTag("LocalPlayer");
+        if (obj != null) localPlayer = obj.GetComponent<PlayerMovement>();
+    }
+
+    private void BuildPlayers()
+    {
+        if (!callbacks.Get(0)) return;
+        callbacks.Set(0, false);
+
+        foreach (OnlinePlayer player in players)
+        {
+            if (!player.built)
+                player.SetOnlinePlayer(Instantiate(onlinePlayer));
+        }
     }
 
     private void ConnectClient()
     {
-        clientSocket.Connect(ep);
+        clientSocket.Connect(serverEndPoint);
 
-        if (!clientSocket.Connected)
-        {
-            Debug.Log("UDP Server not created.");
-            return;
-        }
+        if (!clientSocket.Connected) return;
 
-        connectToScene = true;
+        // JoinServer
+        callbacks.Set(1, true);
 
-        data = Encoding.ASCII.GetBytes(stringData);
+        byte[] data = Encoding.ASCII.GetBytes("Client");
         clientSocket.Send(data, data.Length, SocketFlags.None);
         rcv.Start();
         snd.Start();
-        thr.Abort();
     }
 
     private void Receive()
@@ -101,18 +111,19 @@ public class UDPClient : MonoBehaviour
 
                 EndPoint ip = player.ep;
                 byte[] buffer = new byte[1024];
-
                 clientSocket.ReceiveFrom(buffer, ref ip);
-                recvStream = new MemoryStream(buffer);
-                //uint recUint = serializer.Deserialize(recvStream);
-                //player.movement.SetFlag(recUint);
-                switch (serializer.CheckDataType(recvStream))
+                MemoryStream recvStream = new MemoryStream(buffer);
+
+                switch (Serializer.CheckDataType(recvStream))
                 {
                     case DataType.INPUT_FLAG:
-                        player.movement.SetFlag(serializer.DeserializeFlag(recvStream));
+                        player.movement.SetFlag(Serializer.Deserialize(recvStream).Uint());
                         break;
                     case DataType.WORLD_CHECK:
-                        player.movement.SetPosition(serializer.DeserializeVector(recvStream));
+                        player.movement.SetPosition(Serializer.Deserialize(recvStream).Vector2());
+                        break;
+                    case DataType.LOBBY_MAX:
+                        maxLobbyPlayers = Serializer.Deserialize(recvStream).Uint();
                         break;
                 }
                 recvStream.Flush();
@@ -127,55 +138,37 @@ public class UDPClient : MonoBehaviour
         {
             if (!localPlayer) continue;
 
-            //if (!localPlayer.IsAnyInputActive()) continue;
-
-            //clientSocket.SendTo(serializer.Serialize(localPlayer.GetFlag()).GetBuffer(), ep);
-            //localPlayer.ClearFlag();
-
             if (localPlayer.IsAnyInputActive())
             {
-                clientSocket.SendTo(serializer.SerializeFlag(localPlayer.GetFlag()).GetBuffer(), ep);
-
+                clientSocket.SendTo(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG).GetBuffer(), serverEndPoint);
                 localPlayer.ClearFlag();
             }
 
             if (localPlayer.IsSendingWorldCheck() && localPlayer.GetWorldCheck() != null)
             {
-                clientSocket.SendTo(serializer.SerializeVector(localPlayer.GetWorldCheck().GetValueOrDefault()).GetBuffer(), ep);
-                
+                clientSocket.SendTo(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()).GetBuffer(), serverEndPoint);
                 localPlayer.ClearWorldCheckVector();
             }
         }
-
-        snd.Abort();
     }
 
-    public void JoinServer()
+    public void JoinServer(InputField field)
     {
-        ep = new IPEndPoint(IPAddress.Parse(serverIP), 5554);
-        thr = new Thread(new ThreadStart(ConnectClient));
-        rcv = new Thread(new ThreadStart(Receive));
-        snd = new Thread(new ThreadStart(Send));
+        IPAddress adress;
+        if (!IPAddress.TryParse(field.text, out adress)) return;
+
+        serverEndPoint = new IPEndPoint(adress, 5554);
         thr.Start();
     }
 
     private void ChangeScene(string scene)
     {
         SceneManager.LoadScene(scene);
-
-        if (scene == "LobbyScene")
-        {
-            connectToScene = false;
-            getPlayer = true;
-            players.Add(new OnlinePlayer((IPEndPoint)ep, true));
-            onLobby = true;
-        }
     }
 
-    public void ChangeStringIP()
+    private void AddNewPlayer()
     {
-        serverIP = field.text;
-        Debug.Log("ip: " + serverIP.ToString());
+        callbacks.Set(2, true);
     }
 
     private void OnApplicationQuit()

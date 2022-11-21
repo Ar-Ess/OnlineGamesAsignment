@@ -14,7 +14,7 @@ public class LobbySceneLogic : MonoBehaviour
     // Private
     private UDPServer serverPlayersInfo = null;
     private UDPClient clientPlayersInfo = null;
-    private int nPlayers;
+    private uint prevNumLobbyPlayers;
 
     void Start()
     {
@@ -25,9 +25,7 @@ public class LobbySceneLogic : MonoBehaviour
         if (obj != null)
         {
             serverPlayersInfo = obj.GetComponent<UDPServer>();
-            int maxPlayers = 0;
-            serverPlayersInfo.GetPlayersInfo(ref nPlayers, ref maxPlayers);
-            maxPlayersText.text = "/ " + maxPlayers.ToString();
+            maxPlayersText.text = "/ " + serverPlayersInfo.MaxLobbyPlayers.ToString();
             server = true;
             return;
         }
@@ -36,9 +34,7 @@ public class LobbySceneLogic : MonoBehaviour
         if (obj != null)
         {
             clientPlayersInfo = obj.GetComponent<UDPClient>();
-            int maxPlayers = 0;
-            clientPlayersInfo.GetPlayersInfo(ref nPlayers, ref maxPlayers);
-            maxPlayersText.text = "/ " + maxPlayers.ToString();
+            maxPlayersText.text = "/ " + clientPlayersInfo.MaxLobbyPlayers.ToString();
             joinText.GetComponent<Text>().text = "ALL READY, WAITING HOST";
         }
     }
@@ -53,37 +49,35 @@ public class LobbySceneLogic : MonoBehaviour
     private void UpdateServer()
     {
         if (serverPlayersInfo == null) return;
-        int numPlayers = 0, maxPlayers = 0;
-        serverPlayersInfo.GetPlayersInfo(ref numPlayers, ref maxPlayers);
+        uint maxLobbyPlayers = serverPlayersInfo.MaxLobbyPlayers;
+        uint numLobbyPlayers = serverPlayersInfo.NumLobbyPlayers;
 
-        UpdateStartGame(numPlayers, maxPlayers);
-        UpdateUI(numPlayers, maxPlayers);
+        UpdateStartGame(numLobbyPlayers, maxLobbyPlayers);
+        UpdateUI(numLobbyPlayers, maxLobbyPlayers);
     }
 
     private void UpdateClient()
     {
         if (clientPlayersInfo == null) return;
-        int numPlayers = 0, maxPlayers = 0;
-        clientPlayersInfo.GetPlayersInfo(ref numPlayers, ref maxPlayers);
+        uint maxLobbyPlayers = clientPlayersInfo.MaxLobbyPlayers;
+        uint numLobbyPlayers = clientPlayersInfo.NumLobbyPlayers;
 
-        UpdateUI(numPlayers, maxPlayers);
+        UpdateUI(numLobbyPlayers, maxLobbyPlayers);
     }
 
-    private void UpdateStartGame(int numPlayers, int maxPlayers)
+    private void UpdateStartGame(uint numLobbyPlayers, uint maxLobbyPlayers)
     {
-        if (numPlayers == maxPlayers && Input.GetKeyDown(KeyCode.Return))
-        {
+        if (numLobbyPlayers == maxLobbyPlayers && Input.GetKeyDown(KeyCode.Return)) 
             SceneManagement.ChangeScene("Level1");
-        }
     }
 
-    private void UpdateUI(int numPlayers, int maxPlayers)
+    private void UpdateUI(uint numLobbyPlayers, uint maxLobbyPlayers)
     {
-        if (numPlayers != nPlayers)
+        if (numLobbyPlayers != prevNumLobbyPlayers)
         {
-            joinText.SetActive((numPlayers == maxPlayers));
-            nPlayers = numPlayers;
-            numPlayersText.text = nPlayers.ToString();
+            joinText.SetActive((numLobbyPlayers == maxLobbyPlayers));
+            prevNumLobbyPlayers = numLobbyPlayers;
+            numPlayersText.text = numLobbyPlayers.ToString();
         }
     }
 }

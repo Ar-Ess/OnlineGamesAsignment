@@ -65,7 +65,6 @@ public class PlayerMovement : MonoBehaviour
 
     public Vector2? GetWorldCheck()
     {
-        
         return worldCheckVector;
     }
 

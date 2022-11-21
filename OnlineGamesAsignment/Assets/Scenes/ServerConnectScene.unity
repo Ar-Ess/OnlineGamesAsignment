@@ -966,19 +966,7 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1448313024}
-        m_TargetAssemblyTypeName: UDPServer, Assembly-CSharp
-        m_MethodName: SetNumPlayers
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &474762739
 MonoBehaviour:
@@ -1520,7 +1508,7 @@ GameObject:
   - component: {fileID: 1119123132}
   - component: {fileID: 1119123131}
   m_Layer: 5
-  m_Name: UDPButton
+  m_Name: CreateServerButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1597,6 +1585,18 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1448313024}
+        m_TargetAssemblyTypeName: UDPServer, Assembly-CSharp
+        m_MethodName: SetMaxLobbyPlayers
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 474762738}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Dropdown, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

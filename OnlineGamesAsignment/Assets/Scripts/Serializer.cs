@@ -8,26 +8,21 @@ public enum DataType
 {
     INPUT_FLAG,
     WORLD_CHECK,
+    LOBBY_MAX
 }
-public class Serializer : MonoBehaviour
+
+public static class Serializer
 {
-    public MemoryStream Serialize(uint flag) //We work with flags so we need to serialize integers
+    public static MemoryStream Serialize(uint value, DataType type)
     {
         MemoryStream stream = new MemoryStream();
         BinaryWriter writer = new BinaryWriter(stream);
-        writer.Write(flag);
-        return stream;
-    }
-    public MemoryStream SerializeFlag(uint flag) //We work with flags so we need to serialize integers
-    {
-        MemoryStream stream = new MemoryStream();
-        BinaryWriter writer = new BinaryWriter(stream);
-        writer.Write((int)DataType.INPUT_FLAG);
-        writer.Write(flag);
+        writer.Write((int)type);
+        writer.Write(value);
         return stream;
     }
 
-    public MemoryStream SerializeVector(Vector2 vector2) //We work with flags so we need to serialize integers
+    public static MemoryStream Serialize(Vector2 vector2)
     {
         MemoryStream stream = new MemoryStream();
         BinaryWriter writer = new BinaryWriter(stream);
@@ -37,33 +32,40 @@ public class Serializer : MonoBehaviour
         return stream;
     }
 
-    public uint Deserialize(MemoryStream stream)
+    public class Deserialization
     {
-        BinaryReader reader = new BinaryReader(stream);
-        stream.Seek(0, SeekOrigin.Begin);
-        uint rcvUint = reader.ReadUInt16();
-        return rcvUint;
+        public Deserialization(MemoryStream stream)
+        {
+            this.stream = stream;
+        }
+
+        public uint Uint()
+        {
+            BinaryReader reader = new BinaryReader(stream);
+            stream.Seek(4, SeekOrigin.Begin);
+            uint rcvUint = reader.ReadUInt16();
+            return rcvUint;
+        }
+
+        public Vector2 Vector2()
+        {
+            BinaryReader reader = new BinaryReader(stream);
+            stream.Seek(4, SeekOrigin.Begin);
+            float x = reader.ReadSingle();
+            float y = reader.ReadSingle();
+
+            return new Vector2(x, y);
+        }
+
+        MemoryStream stream;
     }
 
-    public uint DeserializeFlag(MemoryStream stream)
+    public static Deserialization Deserialize(MemoryStream stream)
     {
-        BinaryReader reader = new BinaryReader(stream);
-        stream.Seek(4, SeekOrigin.Begin);
-        uint rcvUint = reader.ReadUInt16();
-        return rcvUint;
+        return new Deserialization(stream);
     }
 
-    public Vector2 DeserializeVector(MemoryStream stream)
-    {
-        BinaryReader reader = new BinaryReader(stream);
-        stream.Seek(4, SeekOrigin.Begin);
-        float x = reader.ReadSingle();
-        float y = reader.ReadSingle();
-
-        return new Vector2(x, y);
-    }
-
-    public DataType CheckDataType(MemoryStream stream)
+    public static DataType CheckDataType(MemoryStream stream)
     {
         BinaryReader reader = new BinaryReader(stream);
         stream.Seek(0, SeekOrigin.Begin);
