@@ -17,7 +17,7 @@ public class UDPServer : MonoBehaviour
 
     // Private
     private Socket serverSocket;
-    private Thread thr, snd, rcv;
+    private Thread lstn, snd, rcv;
     private uint maxLobbyPlayers = 1;
     private PlayerMovement localPlayer = null;
     private List<OnlinePlayer> clients = new List<OnlinePlayer>();
@@ -32,7 +32,7 @@ public class UDPServer : MonoBehaviour
         DontDestroyOnLoad(this);
 
         serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        thr = new Thread(new ThreadStart(Listen));
+        lstn = new Thread(new ThreadStart(Listen));
         snd = new Thread(new ThreadStart(Send));
         rcv = new Thread(new ThreadStart(Receive));
     }
@@ -61,7 +61,7 @@ public class UDPServer : MonoBehaviour
             if (!player.built)
             {
                 player.SetOnlinePlayer(Instantiate(onlinePlayer));
-                //serverSocket.SendTo(Serializer.Serialize(maxLobbyPlayers, DataType.LOBBY_MAX), player.ep);
+                serverSocket.SendTo(Serializer.Serialize(maxLobbyPlayers, DataType.LOBBY_MAX), player.ep);
             }
         }
     }
@@ -76,7 +76,7 @@ public class UDPServer : MonoBehaviour
         serverSocket.Bind(new IPEndPoint(IPAddress.Any, 5554));
 
         ChangeScene("LobbyScene");
-        thr.Start();
+        lstn.Start();
     }
 
     private void Listen()
@@ -89,7 +89,6 @@ public class UDPServer : MonoBehaviour
             byte[] data = new byte[1024];
             int received = serverSocket.ReceiveFrom(data, ref clientEndPoint);
             if (received == 0) continue;
-
             numPlayers++;
             AddNewClient(clientEndPoint);
 
@@ -165,7 +164,7 @@ public class UDPServer : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        if (thr != null) thr.Abort();
+        if (lstn != null) lstn.Abort();
         if (snd != null) snd.Abort();
         if (rcv != null) rcv.Abort();
         if (serverSocket.Connected) serverSocket.Disconnect(false);
