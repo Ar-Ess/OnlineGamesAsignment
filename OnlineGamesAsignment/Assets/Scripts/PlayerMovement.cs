@@ -83,49 +83,74 @@ public class PlayerMovement : MonoBehaviour
     private void UpdateLogic()
     {
         PlayerMove();
-        if (ground && Input.GetKeyDown(KeyCode.Space)) Jump();
-
+        Jump();
         UpdateAnimations(); 
     }
 
     private void PlayerMove()
     {
-        var horizontalInput = Input.GetAxisRaw("Horizontal");
-        rb.velocity = new Vector2(horizontalInput * speed, rb.velocity.y);
+        Vector2 velocity = new Vector2(0, rb.velocity.y);
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        {
+            flag.Set(0, true);
+            velocity.x += speed;
+        }
+
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        {
+            flag.Set(1, true);
+            velocity.x -= speed;
+        }
+
+        if (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow) ||
+            Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.LeftArrow))
+        {
+            flag.Set(3, true);
+            velocity.x = 0;
+        }
+
+        rb.velocity = velocity;
     }
 
     private void Jump()
     {
-
         if (ground && Input.GetKeyDown(KeyCode.Space))
         {
             flag.Set(2, true);
-            rb.velocity = new Vector2(0, jumpForce);
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
-   
     }
 
     private void UpdateAnimations()
     {
-        if (rb.velocity.x > 0 && rb.velocity.y <= 0.1f && ground)
+        // IF ON GROUND
+        if (rb.velocity.y <= 0.1f && ground)
         {
-            sprite.flipX = false;
-            anim.SetInteger("Animation", 1);
-            flag.Set(0, true);
+            // IF GOIN RIGHT ON GROUND
+            if (rb.velocity.x > 0)
+            {
+                sprite.flipX = false;
+                anim.SetInteger("Animation", 1);
+            }
+            // IS GOING LEFT ON GROUND
+            else if (rb.velocity.x < 0)
+            {
+                sprite.flipX = true;
+                anim.SetInteger("Animation", 1);
+            }
+            // IF STAY STILL
+            else
+            {
+                anim.SetInteger("Animation", 0);
+            }
         }
-        else if (rb.velocity.x < 0 && rb.velocity.y <= 0.1f && ground)
-        {
-            sprite.flipX = true;
-            anim.SetInteger("Animation", 1);
-            flag.Set(1, true);
-        }
-        else if (rb.velocity.x == 0)
-        {
-            anim.SetInteger("Animation", 0);
-        }
-        else if (rb.velocity.y > 0 && !ground)
+        else
         {
             anim.SetInteger("Animation", 2);
+            // IF GOIN RIGHT ON AIR
+            if (rb.velocity.x > 0) sprite.flipX = false;
+            // IS GOING LEFT ON GROUND
+            else if (rb.velocity.x < 0) sprite.flipX = true;
         }
     }
 
