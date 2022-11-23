@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Net.Sockets;
-using UnityEngine.SceneManagement;
 using System.Net;
-using System.Collections;
 using System.Threading;
 using UnityEngine.UI;
 using System.Text;
@@ -24,8 +22,9 @@ public class UDPClient : MonoBehaviour
     private List<OnlinePlayer> players = new List<OnlinePlayer>();
     private UDPClient _instance;
     private EndPoint serverEndPoint = null;
-    // BuildPlayer (0) | JoinServer (1) | CreateNewPlayer (2) |
-    private StreamFlag callbacks = new StreamFlag(0); 
+    // BuildPlayer (0) | JoinServer (1) | CreateNewPlayer (2) | GoNextLevel(3)
+    private StreamFlag callbacks = new StreamFlag(0);
+    private uint currentLevel = 0;
 
     private void Awake()
     {
@@ -47,6 +46,15 @@ public class UDPClient : MonoBehaviour
         JoinServerLogic();
         LookForLocalPlayerInstance(); //TODO: Only in lobby
         BuildPlayers();
+        GoNextLevel();
+    }
+
+    private void GoNextLevel()
+    {
+        if (!callbacks.Get(3)) return;
+        callbacks.Set(3, false);
+        currentLevel++;
+        SceneManagement.ChangeScene("Level" + currentLevel.ToString());
     }
 
     private void AddPlayerLogic()
@@ -63,7 +71,7 @@ public class UDPClient : MonoBehaviour
         if (!callbacks.Get(1)) return;
         callbacks.Set(1, false);
 
-        ChangeScene("LobbyScene");
+        SceneManagement.ChangeScene("LobbyScene");
         AddNewPlayer();
     }
 
@@ -83,7 +91,10 @@ public class UDPClient : MonoBehaviour
         foreach (OnlinePlayer player in players)
         {
             if (!player.built)
+            {
                 player.BuildOnlinePlayer(Instantiate(onlinePlayer));
+                DontDestroyOnLoad(player.player);
+            }
         }
     }
 
@@ -126,6 +137,9 @@ public class UDPClient : MonoBehaviour
                     case DataType.LOBBY_MAX:
                         maxLobbyPlayers = Serializer.Deserialize(recvStream).Uint();
                         break;
+                    case DataType.NEXT_LEVEL:
+                        callbacks.Set(3, true);
+                        break;
                 }
             }
 
@@ -161,11 +175,6 @@ public class UDPClient : MonoBehaviour
 
         serverEndPoint = new IPEndPoint(adress, 5554);
         cnct.Start();
-    }
-
-    private void ChangeScene(string scene)
-    {
-        SceneManager.LoadScene(scene);
     }
 
     private void AddNewPlayer()

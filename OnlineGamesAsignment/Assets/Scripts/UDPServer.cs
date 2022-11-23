@@ -2,9 +2,7 @@ using UnityEngine;
 using System.Net;
 using System.Collections;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine.UI;
@@ -23,8 +21,9 @@ public class UDPServer : MonoBehaviour
     private PlayerMovement localPlayer = null;
     private List<OnlinePlayer> clients = new List<OnlinePlayer>();
     private UDPServer _instance;
-    // BuildPlayer (0) | SendInitialData(1)
+    // BuildPlayer (0) | SendInitialData(1) | GoNextLevel(2)
     private StreamFlag callbacks = new StreamFlag(0);
+    private uint currentLevel = 0;
 
     private void Awake()
     {
@@ -62,6 +61,7 @@ public class UDPServer : MonoBehaviour
             if (!player.built)
             {
                 player.BuildOnlinePlayer(Instantiate(onlinePlayer));
+                DontDestroyOnLoad(player.player);
                 StartCoroutine(DelayCallback(1, true, 0.3f)); // Do not touch the 0.3
             }
         }
@@ -76,7 +76,7 @@ public class UDPServer : MonoBehaviour
     {
         serverSocket.Bind(new IPEndPoint(IPAddress.Any, 5554));
 
-        ChangeScene("LobbyScene");
+        SceneManagement.ChangeScene("LobbyScene");
         lstn.Start();
     }
 
@@ -121,6 +121,15 @@ public class UDPServer : MonoBehaviour
                     player.informed = true;
                 }
                 callbacks.Set(1, false);
+            }
+
+            // Send player to change level
+            if (callbacks.Get(2))
+            {
+                foreach (OnlinePlayer player in clients)
+                    SendData(Serializer.Serialize(DataType.NEXT_LEVEL), player.ep);
+
+                callbacks.Set(2, false);
             }
 
             if (localPlayer.IsAnyInputActive())
@@ -183,11 +192,6 @@ public class UDPServer : MonoBehaviour
         serverSocket.Close();
     }
 
-    private void ChangeScene(string scene)
-    {
-        SceneManager.LoadScene(scene);
-    }
-
     // Only use delay when you call this from the main thread
     private void SendData(byte[] data, EndPoint point)
     {
@@ -198,6 +202,13 @@ public class UDPServer : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         callbacks.Set((ushort)index, set);
+    }
+
+    public void GoNextLevel()
+    {
+        currentLevel++;
+        callbacks.Set(2, true);
+        SceneManagement.ChangeScene("Level" + currentLevel.ToString());
     }
 
 }

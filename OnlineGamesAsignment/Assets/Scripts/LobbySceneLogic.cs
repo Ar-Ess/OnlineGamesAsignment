@@ -69,6 +69,7 @@ public class LobbySceneLogic : MonoBehaviour
         {
             maxPlayersText.text = "/ " + maxLobbyPlayers.ToString();
             prevMaxLobbyPlayers = maxLobbyPlayers;
+            joinText.SetActive((numLobbyPlayers == maxLobbyPlayers));
         }
 
         UpdateUI(numLobbyPlayers, maxLobbyPlayers);
@@ -76,8 +77,11 @@ public class LobbySceneLogic : MonoBehaviour
 
     private void UpdateStartGame(uint numLobbyPlayers, uint maxLobbyPlayers)
     {
-        if (numLobbyPlayers == maxLobbyPlayers && Input.GetKeyDown(KeyCode.Return)) 
+        if (numLobbyPlayers == maxLobbyPlayers && Input.GetKeyDown(KeyCode.Return))
+        {
+            serverPlayersInfo.GoNextLevel();
             SceneManagement.ChangeScene("Level1");
+        }
     }
 
     private void UpdateUI(uint numLobbyPlayers, uint maxLobbyPlayers)

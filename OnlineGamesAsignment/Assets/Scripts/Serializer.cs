@@ -8,7 +8,8 @@ public enum DataType
 {
     INPUT_FLAG,
     WORLD_CHECK,
-    LOBBY_MAX
+    LOBBY_MAX,
+    NEXT_LEVEL
 }
 
 public static class Serializer
@@ -19,6 +20,14 @@ public static class Serializer
         BinaryWriter writer = new BinaryWriter(stream);
         writer.Write((int)type);
         writer.Write(value);
+        return stream.GetBuffer();
+    }
+
+    public static byte[] Serialize(DataType type)
+    {
+        MemoryStream stream = new MemoryStream();
+        BinaryWriter writer = new BinaryWriter(stream);
+        writer.Write((int)type);
         return stream.GetBuffer();
     }
 
