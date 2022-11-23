@@ -83,7 +83,7 @@ public class UDPClient : MonoBehaviour
         foreach (OnlinePlayer player in players)
         {
             if (!player.built)
-                player.SetOnlinePlayer(Instantiate(onlinePlayer));
+                player.BuildOnlinePlayer(Instantiate(onlinePlayer));
         }
     }
 
@@ -110,10 +110,8 @@ public class UDPClient : MonoBehaviour
             clientSocket.ReceiveFrom(buffer, ref serverEndPoint);
             MemoryStream recvStream = new MemoryStream(buffer);
 
-            int size = players.Count;
-            for (int i = 0; i < size; ++i)
+            foreach (OnlinePlayer player in players)
             {
-                OnlinePlayer player = players[i];
                 if (!player.built) continue;
                 DataType type = Serializer.CheckDataType(recvStream);
                 if (type != DataType.INPUT_FLAG) Debug.Log(type.ToString());
@@ -144,13 +142,13 @@ public class UDPClient : MonoBehaviour
 
             if (localPlayer.IsAnyInputActive())
             {
-                clientSocket.SendTo(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG), serverEndPoint);
+                SendData(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG));
                 localPlayer.ClearFlag();
             }
 
             if (localPlayer.IsSendingWorldCheck() && localPlayer.GetWorldCheck() != null)
             {
-                clientSocket.SendTo(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()), serverEndPoint);
+                SendData(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()));
                 localPlayer.ClearWorldCheckVector();
             }
         }
@@ -184,14 +182,8 @@ public class UDPClient : MonoBehaviour
         clientSocket.Close();
     }
 
-    private void SendData(byte[] data, float delay = 0)
+    private void SendData(byte[] data)
     {
-        StartCoroutine(SendData_Internal(data, delay));
-    }
-
-    private IEnumerator SendData_Internal(byte[] data, float delay)
-    {
-        if (delay > 0) yield return new WaitForSeconds(delay);
         clientSocket.SendTo(data, serverEndPoint);
     }
 }

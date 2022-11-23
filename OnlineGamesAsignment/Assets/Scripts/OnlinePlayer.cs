@@ -10,18 +10,26 @@ class OnlinePlayer
         this.movement = null;
         this.built = new bool();
         this.built = false;
+        this.informed = new bool();
+        this.informed = false;
         this.server = new bool();
         this.server = server;
     }
 
-    public void SetOnlinePlayer(GameObject player)
+    public void BuildOnlinePlayer(GameObject player)
     {
         this.player = player;
         this.movement = player.GetComponent<OnlinePlayerMovement>();
         this.built = true;
     }
 
+    public bool IsPlayerNotInformed()
+    {
+        return (built && !informed);
+    }
+
     public bool built;
+    public bool informed;
     public bool server;
     public IPEndPoint ep;
     public GameObject player;

@@ -8,13 +8,13 @@ public class LobbySceneLogic : MonoBehaviour
     [SerializeField] private Text numPlayersText = null;
     [SerializeField] private Text maxPlayersText = null;
     [SerializeField] private GameObject joinText = null;
-    private GameObject obj;
     private bool server = false;
 
     // Private
     private UDPServer serverPlayersInfo = null;
     private UDPClient clientPlayersInfo = null;
     private uint prevNumLobbyPlayers;
+    private uint prevMaxLobbyPlayers;
 
     void Start()
     {
@@ -36,6 +36,7 @@ public class LobbySceneLogic : MonoBehaviour
         {
             clientPlayersInfo = obj.GetComponent<UDPClient>();
             maxPlayersText.text = "/ " + clientPlayersInfo.MaxLobbyPlayers.ToString();
+            prevMaxLobbyPlayers = clientPlayersInfo.MaxLobbyPlayers;
             prevNumLobbyPlayers = clientPlayersInfo.NumLobbyPlayers;
             joinText.GetComponent<Text>().text = "ALL READY, WAITING HOST";
         }
@@ -63,6 +64,12 @@ public class LobbySceneLogic : MonoBehaviour
         if (clientPlayersInfo == null) return;
         uint maxLobbyPlayers = clientPlayersInfo.MaxLobbyPlayers;
         uint numLobbyPlayers = clientPlayersInfo.NumLobbyPlayers;
+
+        if (maxLobbyPlayers != prevMaxLobbyPlayers)
+        {
+            maxPlayersText.text = "/ " + maxLobbyPlayers.ToString();
+            prevMaxLobbyPlayers = maxLobbyPlayers;
+        }
 
         UpdateUI(numLobbyPlayers, maxLobbyPlayers);
     }

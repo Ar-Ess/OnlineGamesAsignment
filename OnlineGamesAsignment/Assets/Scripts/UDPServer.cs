@@ -23,7 +23,7 @@ public class UDPServer : MonoBehaviour
     private PlayerMovement localPlayer = null;
     private List<OnlinePlayer> clients = new List<OnlinePlayer>();
     private UDPServer _instance;
-    // BuildPlayer (0) |
+    // BuildPlayer (0) | SendInitialData(1)
     private StreamFlag callbacks = new StreamFlag(0);
 
     private void Awake()
@@ -61,8 +61,8 @@ public class UDPServer : MonoBehaviour
         {
             if (!player.built)
             {
-                player.SetOnlinePlayer(Instantiate(onlinePlayer));
-                SendData(Serializer.Serialize(maxLobbyPlayers, DataType.LOBBY_MAX), player.ep, 1);
+                player.BuildOnlinePlayer(Instantiate(onlinePlayer));
+                StartCoroutine(DelayCallback(1, true, 0.3f)); // Do not touch the 0.3
             }
         }
     }
@@ -111,12 +111,24 @@ public class UDPServer : MonoBehaviour
         {
             if (!localPlayer) continue;
 
+            // Player to inform
+            if (callbacks.Get(1))
+            {
+                foreach (OnlinePlayer player in clients)
+                {
+                    if (player.informed) continue;
+                    SendData(Serializer.Serialize(maxLobbyPlayers, DataType.LOBBY_MAX), player.ep);
+                    player.informed = true;
+                }
+                callbacks.Set(1, false);
+            }
+
             if (localPlayer.IsAnyInputActive())
             {
                 foreach (OnlinePlayer player in clients)
                 {
                     if (!player.built) continue;
-                    SendData(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG), player.ep, 0);
+                    SendData(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG), player.ep);
                 }
 
                 localPlayer.ClearFlag();
@@ -127,7 +139,7 @@ public class UDPServer : MonoBehaviour
                 foreach (OnlinePlayer player in clients)
                 {
                     if (!player.built) continue;
-                    SendData(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()), player.ep, 0);
+                    SendData(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()), player.ep);
                 }
                 localPlayer.ClearWorldCheckVector();
             }
@@ -177,18 +189,15 @@ public class UDPServer : MonoBehaviour
     }
 
     // Only use delay when you call this from the main thread
-    private void SendData(byte[] data, EndPoint point, float delay = 0)
+    private void SendData(byte[] data, EndPoint point)
     {
-        if (delay > 0) 
-            SendData_Internal(data, point, delay);
-        else
-            StartCoroutine(SendData_Internal(data, point, delay));
+        serverSocket.SendTo(data, point);
     }
 
-    private IEnumerator SendData_Internal(byte[] data, EndPoint point, float delay)
+    private IEnumerator DelayCallback(uint index, bool set, float delay)
     {
-        if (delay > 0) yield return new WaitForSeconds(delay);
-        serverSocket.SendTo(data, point);
+        yield return new WaitForSeconds(delay);
+        callbacks.Set((ushort)index, set);
     }
 
 }
