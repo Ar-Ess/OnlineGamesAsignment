@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Net.Sockets;
 using UnityEngine.SceneManagement;
 using System.Net;
+using System.Collections;
 using System.Threading;
 using UnityEngine.UI;
 using System.Text;
@@ -10,14 +11,14 @@ using System.IO;
 
 public class UDPClient : MonoBehaviour
 {
-    [SerializeField] private GameObject onlinePlayer;
+    [SerializeField] private GameObject onlinePlayer = null;
     public UDPClient Instance { get { return _instance; } }
     public uint MaxLobbyPlayers { get { return maxLobbyPlayers; } }
     public uint NumLobbyPlayers { get { return (uint)players.Count + 1; } }
 
     // Private
     private Socket clientSocket;
-    private Thread thr, snd, rcv;
+    private Thread cnct, snd, rcv;
     private uint maxLobbyPlayers = 1;
     private PlayerMovement localPlayer = null;
     private List<OnlinePlayer> players = new List<OnlinePlayer>();
@@ -34,7 +35,7 @@ public class UDPClient : MonoBehaviour
         DontDestroyOnLoad(this);
 
         clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        thr = new Thread(new ThreadStart(ConnectClient));
+        cnct = new Thread(new ThreadStart(ConnectClient));
         rcv = new Thread(new ThreadStart(Receive));
         snd = new Thread(new ThreadStart(Send));
     }
@@ -105,17 +106,18 @@ public class UDPClient : MonoBehaviour
     {
         while (true)
         {
+            byte[] buffer = new byte[1024];
+            clientSocket.ReceiveFrom(buffer, ref serverEndPoint);
+            MemoryStream recvStream = new MemoryStream(buffer);
+
             int size = players.Count;
             for (int i = 0; i < size; ++i)
             {
                 OnlinePlayer player = players[i];
                 if (!player.built) continue;
-
-                byte[] buffer = new byte[1024];
-                clientSocket.ReceiveFrom(buffer, ref serverEndPoint);
-                MemoryStream recvStream = new MemoryStream(buffer);
-
-                switch (Serializer.CheckDataType(recvStream))
+                DataType type = Serializer.CheckDataType(recvStream);
+                if (type != DataType.INPUT_FLAG) Debug.Log(type.ToString());
+                switch (type)
                 {
                     case DataType.INPUT_FLAG:
                         player.movement.SetFlag(Serializer.Deserialize(recvStream).Uint());
@@ -127,9 +129,10 @@ public class UDPClient : MonoBehaviour
                         maxLobbyPlayers = Serializer.Deserialize(recvStream).Uint();
                         break;
                 }
-                recvStream.Flush();
-                recvStream.Dispose();
             }
+
+            recvStream.Flush();
+            recvStream.Dispose();
         }
     }
 
@@ -159,7 +162,7 @@ public class UDPClient : MonoBehaviour
         if (!IPAddress.TryParse(field.text, out adress)) return;
 
         serverEndPoint = new IPEndPoint(adress, 5554);
-        thr.Start();
+        cnct.Start();
     }
 
     private void ChangeScene(string scene)
@@ -174,10 +177,21 @@ public class UDPClient : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        if (thr != null) thr.Abort();
+        if (cnct != null) cnct.Abort();
         if (rcv != null) rcv.Abort();
         if (snd != null) snd.Abort();
         if (clientSocket.Connected) clientSocket.Disconnect(false);
         clientSocket.Close();
+    }
+
+    private void SendData(byte[] data, float delay = 0)
+    {
+        StartCoroutine(SendData_Internal(data, delay));
+    }
+
+    private IEnumerator SendData_Internal(byte[] data, float delay)
+    {
+        if (delay > 0) yield return new WaitForSeconds(delay);
+        clientSocket.SendTo(data, serverEndPoint);
     }
 }

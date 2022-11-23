@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class ClientConnectSceneLogic : MonoBehaviour
 {
-    [SerializeField] GameObject toMoveOne;
-    [SerializeField] GameObject toMoveTwo;
+    [SerializeField] GameObject toMoveOne = null;
+    [SerializeField] GameObject toMoveTwo = null;
     private Vector3 startPositionOne = new Vector3(0.0f, 0.0f);
     private Vector3 startPositionTwo = new Vector3(0.0f, 0.0f);
     [SerializeField] private Vector3 endPositionOne = new Vector3(0.0f, 0.0f);
@@ -23,7 +23,7 @@ public class ClientConnectSceneLogic : MonoBehaviour
         public void SetActive() { obj.SetActive(active); }
     }
 
-    [SerializeField] private ActivableObject[] activables;
+    [SerializeField] private ActivableObject[] activables = new ActivableObject[1];
     public void ChangeScene(string scene)
     {
         startPositionOne = toMoveOne.transform.position;

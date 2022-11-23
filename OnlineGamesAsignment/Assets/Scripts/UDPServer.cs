@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Net;
+using System.Collections;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -10,7 +11,7 @@ using UnityEngine.UI;
 
 public class UDPServer : MonoBehaviour
 {
-    [SerializeField] private GameObject onlinePlayer;
+    [SerializeField] private GameObject onlinePlayer = null;
     public UDPServer Instance { get { return _instance; } }
     public uint MaxLobbyPlayers { get { return maxLobbyPlayers; } }
     public uint NumLobbyPlayers { get { return (uint)clients.Count + 1; } }
@@ -61,7 +62,7 @@ public class UDPServer : MonoBehaviour
             if (!player.built)
             {
                 player.SetOnlinePlayer(Instantiate(onlinePlayer));
-                serverSocket.SendTo(Serializer.Serialize(maxLobbyPlayers, DataType.LOBBY_MAX), player.ep);
+                SendData(Serializer.Serialize(maxLobbyPlayers, DataType.LOBBY_MAX), player.ep, 1);
             }
         }
     }
@@ -115,8 +116,7 @@ public class UDPServer : MonoBehaviour
                 foreach (OnlinePlayer player in clients)
                 {
                     if (!player.built) continue;
-                    serverSocket.SendTo(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG), player.ep);
-
+                    SendData(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG), player.ep, 0);
                 }
 
                 localPlayer.ClearFlag();
@@ -127,7 +127,7 @@ public class UDPServer : MonoBehaviour
                 foreach (OnlinePlayer player in clients)
                 {
                     if (!player.built) continue;
-                    serverSocket.SendTo(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()), player.ep);
+                    SendData(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()), player.ep, 0);
                 }
                 localPlayer.ClearWorldCheckVector();
             }
@@ -174,6 +174,21 @@ public class UDPServer : MonoBehaviour
     private void ChangeScene(string scene)
     {
         SceneManager.LoadScene(scene);
+    }
+
+    // Only use delay when you call this from the main thread
+    private void SendData(byte[] data, EndPoint point, float delay = 0)
+    {
+        if (delay > 0) 
+            SendData_Internal(data, point, delay);
+        else
+            StartCoroutine(SendData_Internal(data, point, delay));
+    }
+
+    private IEnumerator SendData_Internal(byte[] data, EndPoint point, float delay)
+    {
+        if (delay > 0) yield return new WaitForSeconds(delay);
+        serverSocket.SendTo(data, point);
     }
 
 }

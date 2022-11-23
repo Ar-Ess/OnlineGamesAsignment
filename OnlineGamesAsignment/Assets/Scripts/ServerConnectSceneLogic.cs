@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ServerConnectSceneLogic : MonoBehaviour
 {
-    [SerializeField] GameObject toMove;
+    [SerializeField] GameObject toMove = null;
     private Vector3 startPosition = new Vector3(0.0f, 0.0f);
     [SerializeField] private Vector3 endPosition = new Vector3(0.0f, 0.0f);
     [SerializeField] private float interval = 0.0f;
@@ -18,7 +18,7 @@ public class ServerConnectSceneLogic : MonoBehaviour
         public void SetActive() { obj.SetActive(active); }
     }
 
-    [SerializeField] private ActivableObject[] activables;
+    [SerializeField] private ActivableObject[] activables = new ActivableObject[1];
     public void ChangeScene(string scene)
     {
         startPosition = toMove.transform.position;

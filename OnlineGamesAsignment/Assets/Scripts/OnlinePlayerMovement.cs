@@ -8,17 +8,17 @@ using UnityEngine;
 public class OnlinePlayerMovement : MonoBehaviour
 {
     [Header("Placement")]
-    [SerializeField] private Transform spawnpoint;
+    [SerializeField] private Transform spawnpoint = null;
 
     [Header("Physics")]
-    [SerializeField] float speed;
-    [SerializeField] float jumpForce;
+    [SerializeField] float speed = 0;
+    [SerializeField] float jumpForce = 0;
 
     // Private
     private StreamFlag flag = new StreamFlag(0);
     private bool receiveInputs = false;
     private Rigidbody rb;
-    private Collider collider;
+    private Collider playerCollider;
     private SpriteRenderer sprite;
     private Animator anim;
     private Vector2? receivePosition = null;
@@ -29,7 +29,7 @@ public class OnlinePlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
-        collider = GetComponent<Collider>();
+        playerCollider = GetComponent<Collider>();
     }
 
     private void Update()
@@ -94,7 +94,7 @@ public class OnlinePlayerMovement : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag.Equals("LocalPlayer"))
-            Physics.IgnoreCollision(collision.collider, collider);
+            Physics.IgnoreCollision(collision.collider, playerCollider);
     }
 
     public void SetPosition(Vector2 vector2)

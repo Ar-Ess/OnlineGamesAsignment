@@ -4,10 +4,10 @@ using UnityEngine.UI;
 
 public class LobbySceneLogic : MonoBehaviour
 {
-    [SerializeField] private GameObject localPlayer;
-    [SerializeField] private Text numPlayersText;
-    [SerializeField] private Text maxPlayersText;
-    [SerializeField] private GameObject joinText;
+    [SerializeField] private GameObject localPlayer = null;
+    [SerializeField] private Text numPlayersText = null;
+    [SerializeField] private Text maxPlayersText = null;
+    [SerializeField] private GameObject joinText = null;
     private GameObject obj;
     private bool server = false;
 

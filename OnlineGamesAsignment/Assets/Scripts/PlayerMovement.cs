@@ -7,11 +7,11 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Placement")]
-    [SerializeField] private Transform spawnpoint;
+    [SerializeField] private Transform spawnpoint = null;
 
     [Header("Physics")]
-    [SerializeField] float speed;
-    [SerializeField] float jumpForce;
+    [SerializeField] float speed = 0;
+    [SerializeField] float jumpForce = 0;
     [Header("Time")]
     [SerializeField] float timeInterval = 1.0f;
 
@@ -19,7 +19,7 @@ public class PlayerMovement : MonoBehaviour
     private StreamFlag flag = new StreamFlag(0);
     private bool ground = false;
     private Rigidbody rb;
-    private Collider collider;
+    private Collider playerCollider;
     private SpriteRenderer sprite;
     private Animator anim;
     private float timer = 0;
@@ -31,17 +31,14 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
-        collider = GetComponent<Collider>();
+        playerCollider = GetComponent<Collider>();
     }
 
     private void Update()
     {
         flag.Clear();
         UpdateLogic();
-        //UpdateWorldCheck();
-
-        
-
+        UpdateWorldCheck();
     }
 
     private void UpdateWorldCheck()
@@ -136,7 +133,7 @@ public class PlayerMovement : MonoBehaviour
     {
 
         if (collision.gameObject.tag.Equals("OnlinePlayer"))
-            Physics.IgnoreCollision(collision.collider, collider);
+            Physics.IgnoreCollision(collision.collider, playerCollider);
     }
 
     private void OnCollisionStay(Collision collision)

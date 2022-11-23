@@ -14,7 +14,7 @@ public class SetActiveOnTime : MonoBehaviour
     }
 
     [SerializeField] private float m_DelayTime = 0.0f;
-    [SerializeField] private ActivableObject[] activables;
+    [SerializeField] private ActivableObject[] activables = new ActivableObject[1];
     // Start is called before the first frame update
     void Start()
     {
