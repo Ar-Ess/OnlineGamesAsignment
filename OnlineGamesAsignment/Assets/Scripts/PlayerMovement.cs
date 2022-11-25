@@ -6,14 +6,12 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Placement")]
-    [SerializeField] private Transform spawnpoint = null;
 
     [Header("Physics")]
     [SerializeField] float speed = 0;
     [SerializeField] float jumpForce = 0;
     [Header("Time")]
-    [SerializeField] float timeInterval = 1.0f;
+    [SerializeField] float timeIntervalWorldCheck = 1.0f;
 
     // Accessors
     public uint Flag { get { return flag.flag; } }
@@ -33,7 +31,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
-        transform.position = spawnpoint.position;
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
@@ -51,7 +48,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (worldCheckVector != null) return;
 
-        if (timer < timeInterval) timer += Time.deltaTime;
+        if (timer < timeIntervalWorldCheck) timer += Time.deltaTime;
         else worldCheckVector = new Vector2(transform.position.x, transform.position.y);
     }
 
