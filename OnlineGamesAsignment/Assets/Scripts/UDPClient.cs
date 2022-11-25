@@ -154,15 +154,15 @@ public class UDPClient : MonoBehaviour
         {
             if (!localPlayer) continue;
 
-            if (localPlayer.IsAnyInputActive())
+            if (localPlayer.IsAnyInputActive)
             {
-                SendData(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG));
-                localPlayer.ClearFlag();
+                SendData(Serializer.Serialize(localPlayer.Flag, DataType.INPUT_FLAG));
+                localPlayer.ClearInputFlag();
             }
 
-            if (localPlayer.IsSendingWorldCheck() && localPlayer.GetWorldCheck() != null)
+            if (localPlayer.IsSendWorldCheck)
             {
-                SendData(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()));
+                SendData(Serializer.Serialize(localPlayer.WorldCheck));
                 localPlayer.ClearWorldCheckVector();
             }
         }

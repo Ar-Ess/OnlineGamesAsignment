@@ -15,6 +15,12 @@ public class PlayerMovement : MonoBehaviour
     [Header("Time")]
     [SerializeField] float timeInterval = 1.0f;
 
+    // Accessors
+    public uint Flag { get { return flag.flag; } }
+    public bool IsAnyInputActive { get { return flag.IsAnyTrue(); } }
+    public Vector2 WorldCheck { get { return worldCheckVector.GetValueOrDefault(); } }
+    public bool IsSendWorldCheck { get { return (worldCheckVector != null); } }
+
     // Private
     private StreamFlag flag = new StreamFlag(0);
     private bool ground = false;
@@ -49,74 +55,58 @@ public class PlayerMovement : MonoBehaviour
         else worldCheckVector = new Vector2(transform.position.x, transform.position.y);
     }
 
-    public bool IsSendingWorldCheck()
-    {
-        return (worldCheckVector != null);
-    }
-
     public void ClearWorldCheckVector()
     {
         worldCheckVector = null;
         timer = 0.0f;
     }
 
-    public Vector2? GetWorldCheck()
-    {
-        return worldCheckVector;
-    }
-
-    public bool IsAnyInputActive()
-    {
-        return flag.IsAnyTrue();
-    }
-
-    public uint GetFlag()
-    {
-        return flag.flag;
-    }
-
-    public void ClearFlag()
+    public void ClearInputFlag()
     {
         flag.Clear();
     }
 
     private void UpdateLogic()
     {
-        PlayerMove();
-        Jump();
-        UpdateAnimations(); 
+        StreamFlag frameFlag = new StreamFlag(0);
+
+        PlayerMove(frameFlag);
+        Jump(frameFlag);
+        UpdateAnimations();
+
+        flag.Set(frameFlag.flag);
     }
 
-    private void PlayerMove()
+    private void PlayerMove(StreamFlag frameFlag)
     {
         Vector2 velocity = new Vector2(0, rb.velocity.y);
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            flag.Set(0, true);
+            frameFlag.Set(0, true);
             velocity.x += speed;
         }
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            flag.Set(1, true);
+            frameFlag.Set(1, true);
             velocity.x -= speed;
         }
 
         if (Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow) ||
             Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.LeftArrow))
         {
-            flag.Set(3, true);
+            frameFlag.Set(3, true);
             velocity.x = 0;
         }
 
         rb.velocity = velocity;
     }
 
-    private void Jump()
+    private void Jump(StreamFlag frameFlag)
     {
         if (ground && Input.GetKeyDown(KeyCode.Space))
         {
-            flag.Set(2, true);
+            frameFlag.Set(2, true);
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
     }
@@ -156,7 +146,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-
         if (collision.gameObject.tag.Equals("OnlinePlayer"))
             Physics.IgnoreCollision(collision.collider, playerCollider);
     }

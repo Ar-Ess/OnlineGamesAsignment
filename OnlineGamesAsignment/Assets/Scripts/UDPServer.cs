@@ -132,23 +132,23 @@ public class UDPServer : MonoBehaviour
                 callbacks.Set(2, false);
             }
 
-            if (localPlayer.IsAnyInputActive())
+            if (localPlayer.IsAnyInputActive)
             {
                 foreach (OnlinePlayer player in clients)
                 {
                     if (!player.built) continue;
-                    SendData(Serializer.Serialize(localPlayer.GetFlag(), DataType.INPUT_FLAG), player.ep);
+                    SendData(Serializer.Serialize(localPlayer.Flag, DataType.INPUT_FLAG), player.ep);
                 }
 
-                localPlayer.ClearFlag();
+                localPlayer.ClearInputFlag();
             }
 
-            if (localPlayer.IsSendingWorldCheck() && localPlayer.GetWorldCheck() != null)
+            if (localPlayer.IsSendWorldCheck)
             {
                 foreach (OnlinePlayer player in clients)
                 {
                     if (!player.built) continue;
-                    SendData(Serializer.Serialize(localPlayer.GetWorldCheck().GetValueOrDefault()), player.ep);
+                    SendData(Serializer.Serialize(localPlayer.WorldCheck), player.ep);
                 }
                 localPlayer.ClearWorldCheckVector();
             }
