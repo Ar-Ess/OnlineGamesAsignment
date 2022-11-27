@@ -28,8 +28,7 @@ public class UDPClient : MonoBehaviour
 
     private void Awake()
     {
-        if (_instance != null && _instance != this)
-            Destroy(this.gameObject);
+        if (_instance != null && _instance != this) Destroy(this.gameObject);
         else _instance = this;
         DontDestroyOnLoad(this);
 
@@ -80,7 +79,7 @@ public class UDPClient : MonoBehaviour
         if (localPlayer != null) return;
 
         GameObject obj = GameObject.FindGameObjectWithTag("LocalPlayer");
-        if (obj != null) localPlayer = obj.GetComponent<PlayerMovement>();
+        if (obj != null) localPlayer = obj.GetComponentInChildren<PlayerMovement>();
     }
 
     private void BuildPlayers()

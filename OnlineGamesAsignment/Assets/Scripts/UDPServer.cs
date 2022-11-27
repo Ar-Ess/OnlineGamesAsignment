@@ -48,7 +48,7 @@ public class UDPServer : MonoBehaviour
         if (localPlayer != null) return;
 
         GameObject obj = GameObject.FindGameObjectWithTag("LocalPlayer");
-        if (obj != null) localPlayer = obj.GetComponent<PlayerMovement>();
+        if (obj != null) localPlayer = obj.GetComponentInChildren<PlayerMovement>();
     }
 
     private void BuildPlayers()
