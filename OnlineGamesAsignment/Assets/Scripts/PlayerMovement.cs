@@ -117,7 +117,7 @@ public class PlayerMovement : MonoBehaviour
     private void UpdateAnimations()
     {
         // IF ON GROUND
-        if (rb.velocity.y <= 0.1f && ground)
+        if (rb.velocity.y <= 0.3f && ground)
         {
             // IF GOIN RIGHT ON GROUND
             if (rb.velocity.x > 0)
