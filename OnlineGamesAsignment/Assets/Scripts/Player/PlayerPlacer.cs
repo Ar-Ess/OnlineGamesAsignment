@@ -13,4 +13,9 @@ public class PlayerPlacer : MonoBehaviour
         transform.position = spawnpoint.position;
         transform.localScale = new Vector3(globalScale, globalScale, 1);
     }
+
+    private void Start()
+    {
+        
+    }
 }

@@ -11,8 +11,7 @@ public class CameraMovement : MonoBehaviour
     void Update()
     {
         if (player == null) player = GameObject.FindGameObjectWithTag("LocalPlayer").transform.Find("Physics").gameObject;
-
-        Movement();
+        else Movement();
     }
 
     private void Movement()
