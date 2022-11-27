@@ -124,7 +124,7 @@ public class UDPClient : MonoBehaviour
             {
                 if (!player.built) continue;
                 DataType type = Serializer.CheckDataType(recvStream);
-                if (type != DataType.INPUT_FLAG) Debug.Log(type.ToString());
+                //if (type != DataType.INPUT_FLAG) Debug.Log(type.ToString());
                 switch (type)
                 {
                     case DataType.INPUT_FLAG:

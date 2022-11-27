@@ -19,7 +19,6 @@ public class LobbySceneLogic : MonoBehaviour
     void Start()
     {
         Instantiate(localPlayer);
-        DontDestroyOnLoad(localPlayer);
 
         GameObject obj = GameObject.Find("UDPServer");
         if (obj != null)

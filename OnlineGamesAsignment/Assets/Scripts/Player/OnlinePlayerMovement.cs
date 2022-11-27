@@ -5,9 +5,12 @@ using UnityEngine;
 
 public class OnlinePlayerMovement : MonoBehaviour
 {
+
     [Header("Physics")]
     [SerializeField] float speed = 0;
     [SerializeField] float jumpForce = 0;
+    [Header("World Check")]
+    [SerializeField] int wCFreedomDegree = 1;
 
     // Private
     private StreamFlag flag = new StreamFlag(0);
@@ -30,11 +33,18 @@ public class OnlinePlayerMovement : MonoBehaviour
     {
         if(receiveInputs) UpdateLogic();
 
-        if(receivePosition != null)
-        {
-            transform.position = new Vector3(receivePosition.GetValueOrDefault().x, receivePosition.GetValueOrDefault().y, transform.position.z);
-            receivePosition = null;
-        }
+        if (receivePosition != null) UpdateWorldCheck();
+    }
+
+    private void UpdateWorldCheck()
+    {
+        Vector2 worldCheck = receivePosition.GetValueOrDefault();
+
+        if (Mathf.Abs(transform.position.x - worldCheck.x) <= wCFreedomDegree) worldCheck.x = transform.position.x;
+        if (Mathf.Abs(transform.position.y - worldCheck.y) <= wCFreedomDegree) worldCheck.y = transform.position.y;
+
+        transform.position = new Vector3(worldCheck.x, worldCheck.y, transform.position.z);
+        receivePosition = null;
     }
 
     public void SetFlag(uint uflag)
@@ -47,7 +57,6 @@ public class OnlinePlayerMovement : MonoBehaviour
     {
         if (!flag.IsAnyTrue())
         {
-            anim.SetInteger("Animation", 0);
             receiveInputs = false;
             return;
         }
@@ -57,7 +66,7 @@ public class OnlinePlayerMovement : MonoBehaviour
         if (flag.Get(0)) velocity += MoveRight();
         if (flag.Get(1)) velocity += MoveLeft();
         if (flag.Get(2)) velocity += Jump();
-        if (flag.Get(3)) rb.velocity = new Vector2(0.0f, rb.velocity.y);
+        if (flag.Get(3)) rb.velocity = Still();
 
         rb.velocity = new Vector2(velocity.x, rb.velocity.y + velocity.y);
 
@@ -80,9 +89,14 @@ public class OnlinePlayerMovement : MonoBehaviour
 
     private Vector2 Jump() 
     {
-        Debug.Log("jump");
         anim.SetInteger("Animation", 2);
         return new Vector2(0, jumpForce);
+    }
+
+    private Vector2 Still()
+    {
+        anim.SetInteger("Animation", 0);
+        return new Vector2(0.0f, rb.velocity.y);
     }
 
     private void OnCollisionEnter(Collision collision)
