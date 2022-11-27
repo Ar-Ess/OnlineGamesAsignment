@@ -28,6 +28,12 @@ public class PlayerMovement : MonoBehaviour
     private Animator anim;
     private float timer = 0;
     private Vector2? worldCheckVector = null;
+    private Vector2 spawn = new Vector2(0.0f,0.0f);
+
+    private void Awake()
+    {
+        spawn = transform.position;
+    }
 
     private void Start()
     {
@@ -141,10 +147,18 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void Death()
+    {
+        transform.position = spawn;
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag.Equals("OnlinePlayer"))
             Physics.IgnoreCollision(collision.collider, playerCollider);
+        if (collision.gameObject.tag.Equals("Death"))
+            Death();
+
     }
 
     private void OnCollisionStay(Collision collision)
