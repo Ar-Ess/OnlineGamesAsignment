@@ -10,7 +10,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Physics")]
     [SerializeField] float speed = 0;
     [SerializeField] float jumpForce = 0;
-    [Header("Time")]
+    [Header("World Check")]
     [SerializeField] float timeIntervalWorldCheck = 1.0f;
 
     // Accessors
