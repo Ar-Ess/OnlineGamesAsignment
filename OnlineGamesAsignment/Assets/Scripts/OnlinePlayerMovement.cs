@@ -3,13 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
 public class OnlinePlayerMovement : MonoBehaviour
 {
-    [Header("Placement")]
-    [SerializeField] private Transform spawnpoint = null;
-
     [Header("Physics")]
     [SerializeField] float speed = 0;
     [SerializeField] float jumpForce = 0;
@@ -25,7 +20,6 @@ public class OnlinePlayerMovement : MonoBehaviour
 
     private void Start()
     {
-        transform.position = spawnpoint.position;
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();

@@ -19,7 +19,7 @@ class OnlinePlayer
     public void BuildOnlinePlayer(GameObject player)
     {
         this.player = player;
-        this.movement = player.GetComponent<OnlinePlayerMovement>();
+        this.movement = player.GetComponentInChildren<OnlinePlayerMovement>();
         this.built = true;
     }
 
