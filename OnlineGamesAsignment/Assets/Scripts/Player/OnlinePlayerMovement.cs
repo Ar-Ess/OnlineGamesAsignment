@@ -89,7 +89,6 @@ public class OnlinePlayerMovement : MonoBehaviour
 
     private Vector2 Jump() 
     {
-        Debug.Log("jump");
         anim.SetInteger("Animation", 2);
         return new Vector2(0, jumpForce);
     }
