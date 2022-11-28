@@ -11,6 +11,10 @@ public class ClientConnectSceneLogic : MonoBehaviour
     private Vector3 startPositionTwo = new Vector3(0.0f, 0.0f);
     [SerializeField] private Vector3 endPositionOne = new Vector3(0.0f, 0.0f);
     [SerializeField] private Vector3 endPositionTwo = new Vector3(0.0f, 0.0f);
+    [Header("Keep same:")]
+    [SerializeField] private bool x = false;
+    [SerializeField] private bool y = false;
+    [SerializeField] private bool z = false;
     [SerializeField] private float interval = 0.0f;
     [SerializeField] private float delayTime = 0.0f;
 
@@ -26,6 +30,21 @@ public class ClientConnectSceneLogic : MonoBehaviour
     [SerializeField] private ActivableObject[] activables = new ActivableObject[1];
     public void ChangeScene(string scene)
     {
+        if (x)
+        {
+            endPositionOne.x = toMoveOne.transform.position.x;
+            endPositionTwo.x = toMoveTwo.transform.position.x;
+        }
+        if (y)
+        {
+            endPositionOne.y = toMoveOne.transform.position.y;
+            endPositionTwo.y = toMoveTwo.transform.position.y;
+        }
+        if (z)
+        {
+            endPositionOne.z = toMoveOne.transform.position.z;
+            endPositionTwo.z = toMoveTwo.transform.position.z;
+        }
         startPositionOne = toMoveOne.transform.position;
         startPositionTwo = toMoveTwo.transform.position;
         StartCoroutine(TransitionBackgroundToScene(scene));

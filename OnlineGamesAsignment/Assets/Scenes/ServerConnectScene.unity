@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -153,9 +153,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toMove: {fileID: 1317115858}
-  endPosition: {x: 0, y: -110, z: 0}
-  interval: 1
-  delayTime: 0.1
+  endPosition: {x: 0, y: 0, z: 0}
+  interval: 1.5
+  delayTime: 0
+  x: 0
+  y: 1
+  z: 1
   activables:
   - obj: {fileID: 660756486}
     active: 0
@@ -550,7 +553,6 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
 --- !u!223 &311002348
 Canvas:
   m_ObjectHideFlags: 0
@@ -609,7 +611,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 025b58dcd04f5ab46bde5352a03a7a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_DelayTime: 1.2
+  m_DelayTime: 1.5
   activables:
   - obj: {fileID: 660756486}
     active: 1
@@ -776,7 +778,6 @@ Light:
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!4 &444219401
@@ -923,7 +924,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Navigation:
     m_Mode: 3
-    m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -1138,7 +1138,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Navigation:
     m_Mode: 3
-    m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -1271,7 +1270,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Navigation:
     m_Mode: 3
-    m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -1548,7 +1546,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Navigation:
     m_Mode: 3
-    m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -1990,10 +1987,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ab13e7cdbd9be349adb0e58f84b0f6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPosition: {x: 0, y: -110, z: 0}
-  endPosition: {x: -280, y: -110, z: 0}
+  endPosition: {x: -290, y: 0, z: 0}
   interval: 1.5
   delayTime: 0.3
+  x: 0
+  y: 1
+  z: 1
 --- !u!114 &1448313024 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6288909075645034861, guid: eda4d3e2ff098854d9677993e78d6c6d, type: 3}
@@ -2137,7 +2136,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Navigation:
     m_Mode: 3
-    m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}

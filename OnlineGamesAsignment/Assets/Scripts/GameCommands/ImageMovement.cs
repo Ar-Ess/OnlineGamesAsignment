@@ -4,14 +4,24 @@ using UnityEngine;
 
 public class ImageMovement : MonoBehaviour
 {
-    [SerializeField] private Vector3 startPosition = new Vector3(0.0f, 0.0f);
     [SerializeField] private Vector3 endPosition = new Vector3(0.0f,0.0f);
     [SerializeField] private float interval = 0.0f;
     [SerializeField] private float delayTime = 0.0f;
-    // Start is called before the first frame update
+
+    [Header("Keep same:")]
+    [SerializeField] private bool x = false;
+    [SerializeField] private bool y = false;
+    [SerializeField] private bool z = false;
+
+    private Vector3 startPosition = new Vector3(0.0f, 0.0f);
+
     void Start()
     {
-        transform.position = startPosition;
+        if (x && y && z) return;
+        if (x) endPosition.x = transform.position.x;
+        if (y) endPosition.y = transform.position.y;
+        if (z) endPosition.z = transform.position.z;
+        startPosition = transform.position;
 
         StartCoroutine(MoveImage());
     }
