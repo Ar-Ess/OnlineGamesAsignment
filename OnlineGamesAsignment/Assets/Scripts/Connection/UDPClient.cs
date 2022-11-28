@@ -103,6 +103,8 @@ public class UDPClient : MonoBehaviour
 
         if (!clientSocket.Connected) return;
 
+
+
         // JoinServer
         callbacks.Set(1, true);
 

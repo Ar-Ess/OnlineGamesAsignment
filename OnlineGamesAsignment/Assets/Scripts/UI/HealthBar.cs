@@ -5,33 +5,40 @@ using System.Collections;
 public class HealthBar : MonoBehaviour
 {
     [SerializeField] Image healthBarImage;
-    private PlayerMovement player = null;
-    // Start is called before the first frame update
-    void Start()
+
+    public int health = 0;
+    public int maxHealth = 0;
+
+    private void Start()
     {
-        
-    }
-    // Update is called once per frame
-    void Update()
-    {
-        LookForLocalPlayerInstance();
-        Health();
+        Debug.Log(name + transform.position);
     }
 
-    void Health()
+    public void SetHealthBar(int maxHealth)
     {
-        if (player == null) return;
-        healthBarImage.fillAmount = Mathf.Clamp(player.Health / player.MaxHealth, 0.0f, 1.0f);
+        health = maxHealth;
+        this.maxHealth = maxHealth;
+        RestoreHealth();
     }
 
-    void LookForLocalPlayerInstance()
+    private void UpdateHealth()
     {
-        if (player != null) return;
+        healthBarImage.fillAmount = health / (float)maxHealth;
+    }
 
-        GameObject obj = GameObject.FindGameObjectWithTag("LocalPlayer");
-        if (obj != null)
-            player = obj.transform.GetComponentInChildren<PlayerMovement>();
+    public void RestoreHealth()
+    {
+        health = maxHealth;
+        UpdateHealth();
+    }
 
+    public bool Damage(int amount)
+    {
+        health -= amount;
+        if (health <= 0) return true;
+
+        UpdateHealth();
+        return false;
     }
 
 }

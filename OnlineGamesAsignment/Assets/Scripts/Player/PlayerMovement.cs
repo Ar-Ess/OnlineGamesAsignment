@@ -12,15 +12,16 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float jumpForce = 0;
     [Header("World Check")]
     [SerializeField] float timeIntervalWorldCheck = 1.0f;
+    [Header("Health")]
+    [SerializeField] private GameObject healthBarInstance = null;
+    [SerializeField] private int maxHealth = 5;
 
     // Accessors
     public uint Flag { get { return flag.flag; } }
     public bool IsAnyInputActive { get { return flag.IsAnyTrue(); } }
     public Vector2 WorldCheck { get { return worldCheckVector.GetValueOrDefault(); } }
     public bool IsSendWorldCheck { get { return (worldCheckVector != null); } }
-
-    public int Health { get { return health; } }
-    public int MaxHealth { get { return maxHealth; } }
+    public int health { get { return healthBar.health; } }
 
     // Private
     private StreamFlag flag = new StreamFlag(0);
@@ -32,14 +33,15 @@ public class PlayerMovement : MonoBehaviour
     private float timer = 0;
     private Vector2? worldCheckVector = null;
     private Vector2 spawn = new Vector2(0.0f,0.0f);
-    private int health;
-    private int maxHealth;
+    private HealthBar healthBar;
 
     private void Awake()
     {
         spawn = transform.position;
-        health = 10;
-        maxHealth = health;
+        GameObject healthBarObject = Instantiate(healthBarInstance);
+        healthBarObject.transform.SetParent(GameObject.Find("Canvas").transform);
+        healthBar = healthBarObject.GetComponent<HealthBar>();
+        healthBar.SetHealthBar(maxHealth);
     }
 
     private void Start()
@@ -157,31 +159,28 @@ public class PlayerMovement : MonoBehaviour
     private void Death()
     {
         transform.position = spawn;
+        healthBar.RestoreHealth();
     }
 
     private void Hit()
     {
-        health -= 1;
         Debug.Log("Hit");
+        if (healthBar.Damage(1)) Death();
+    }
 
-        if (health <= 0)
-        {
-            Death();
-            health = maxHealth;
-        }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag.Equals("Enemy") && !other.isTrigger)
+            Hit();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag.Equals("OnlinePlayer"))
             Physics.IgnoreCollision(collision.collider, playerCollider);
+
         if (collision.gameObject.tag.Equals("Death"))
             Death();
-        if(collision.gameObject.tag.Equals("Enemy"))
-        {
-            Hit();
-        }
-
     }
 
     private void OnCollisionStay(Collision collision)
