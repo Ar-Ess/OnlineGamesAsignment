@@ -19,6 +19,9 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 WorldCheck { get { return worldCheckVector.GetValueOrDefault(); } }
     public bool IsSendWorldCheck { get { return (worldCheckVector != null); } }
 
+    public int Health { get { return health; } }
+    public int MaxHealth { get { return maxHealth; } }
+
     // Private
     private StreamFlag flag = new StreamFlag(0);
     private bool ground = false;
@@ -29,10 +32,14 @@ public class PlayerMovement : MonoBehaviour
     private float timer = 0;
     private Vector2? worldCheckVector = null;
     private Vector2 spawn = new Vector2(0.0f,0.0f);
+    private int health;
+    private int maxHealth;
 
     private void Awake()
     {
         spawn = transform.position;
+        health = 10;
+        maxHealth = health;
     }
 
     private void Start()
@@ -152,12 +159,28 @@ public class PlayerMovement : MonoBehaviour
         transform.position = spawn;
     }
 
+    private void Hit()
+    {
+        health -= 1;
+        Debug.Log("Hit");
+
+        if (health <= 0)
+        {
+            Death();
+            health = maxHealth;
+        }
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag.Equals("OnlinePlayer"))
             Physics.IgnoreCollision(collision.collider, playerCollider);
         if (collision.gameObject.tag.Equals("Death"))
             Death();
+        if(collision.gameObject.tag.Equals("Enemy"))
+        {
+            Hit();
+        }
 
     }
 

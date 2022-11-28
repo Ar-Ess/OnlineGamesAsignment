@@ -9,6 +9,7 @@ TagManager:
   - OnlinePLayer
   - Wall
   - Death
+  - Enemy
   layers:
   - Default
   - TransparentFX
