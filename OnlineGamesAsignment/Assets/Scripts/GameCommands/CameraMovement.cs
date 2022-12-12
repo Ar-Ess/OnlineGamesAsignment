@@ -5,12 +5,16 @@ using UnityEngine;
 public class CameraMovement : MonoBehaviour
 {
     [SerializeField] private Vector3 m_CameraOffset = new Vector3(0, 0, 0);
-    private GameObject player = null;
+    private Transform player = null;
 
     // Update is called once per frame
     void Update()
     {
-        if (player == null) player = GameObject.FindGameObjectWithTag("LocalPlayer").transform.Find("Physics").gameObject;
+        if (player == null) 
+        {
+            GameObject obj = GameObject.FindGameObjectWithTag("LocalPlayer");
+            if (obj != null) player = obj.transform.Find("Physics");
+        }
         else Movement();
     }
 

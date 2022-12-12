@@ -178,7 +178,7 @@ MonoBehaviour:
   behaviour: 1
   velocity: {x: -4, y: 0}
   startOnTriggerEnter: 1
-  triggerTag: LocalPlayer
+  triggerTag: PlayerInternal
   amplitude: {x: 2, y: 0}
 --- !u!54 &1152828484
 Rigidbody:

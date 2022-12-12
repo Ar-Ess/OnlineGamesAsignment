@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7007100426195793724}
   m_Layer: 0
   m_Name: Trigger
-  m_TagString: LocalPlayer
+  m_TagString: PlayerInternal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 3509238627374164708}
   m_Layer: 9
   m_Name: Physics
-  m_TagString: LocalPlayer
+  m_TagString: PlayerInternal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

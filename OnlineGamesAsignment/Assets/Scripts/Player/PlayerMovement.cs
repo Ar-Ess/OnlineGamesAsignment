@@ -172,15 +172,15 @@ public class PlayerMovement : MonoBehaviour
     {
         if (other.gameObject.tag.Equals("Enemy") && !other.isTrigger)
             Hit();
+
+        if (other.gameObject.tag.Equals("Death"))
+            Death();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag.Equals("OnlinePlayer"))
+        if (collision.gameObject.tag.Equals("PlayerInternal") && this != collision.gameObject)
             Physics.IgnoreCollision(collision.collider, playerCollider);
-
-        if (collision.gameObject.tag.Equals("Death"))
-            Death();
     }
 
     private void OnCollisionStay(Collision collision)

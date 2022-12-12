@@ -90,16 +90,14 @@ public class EnemyLogic : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.gameObject.tag.Equals("Death"))
+            Destroy(this);
+
         if (other.tag.Equals("Ground")) return;
 
-        if (behaviour == Behaviour.MOVE_FORWARD && startOnTriggerEnter  && other.tag.Equals(triggerTag))
+        if (behaviour == Behaviour.MOVE_FORWARD && startOnTriggerEnter && other.tag.Equals(triggerTag))
+        {
             moveForward = true;
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-
-        if (collision.gameObject.tag.Equals("Death"))
-            Destroy(this);
+        }
     }
 }
