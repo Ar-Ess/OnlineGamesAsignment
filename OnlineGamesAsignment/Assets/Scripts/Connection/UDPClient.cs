@@ -22,7 +22,7 @@ public class UDPClient : MonoBehaviour
     private List<OnlinePlayer> players = new List<OnlinePlayer>();
     private UDPClient _instance;
     private EndPoint serverEndPoint = null;
-    // BuildPlayer (0) | JoinServer (1) | CreateNewPlayer (2) | GoNextLevel(3)
+    // BuildPlayer (0) | JoinServer (1) | CreateNewPlayer (2) | GoNextLevel(3) | ServerConnected(4)
     private StreamFlag callbacks = new StreamFlag(0);
     private uint currentLevel = 0;
 
@@ -99,19 +99,15 @@ public class UDPClient : MonoBehaviour
 
     private void ConnectClient()
     {
-        clientSocket.Connect(serverEndPoint);
+        while (!clientSocket.Connected) clientSocket.Connect(serverEndPoint);
 
-        if (!clientSocket.Connected) return;
+        // ServerConnected
+        callbacks.Set(4, true);
 
+        SendData(Encoding.ASCII.GetBytes("Client"));
 
-
-        // JoinServer
-        callbacks.Set(1, true);
-
-        byte[] data = Encoding.ASCII.GetBytes("Client");
-        clientSocket.Send(data, data.Length, SocketFlags.None);
-        rcv.Start();
-        snd.Start();
+        if (!rcv.IsAlive) rcv.Start();
+        if (!snd.IsAlive) snd.Start();
     }
 
     private void Receive()
@@ -140,6 +136,9 @@ public class UDPClient : MonoBehaviour
                         break;
                     case DataType.NEXT_LEVEL:
                         callbacks.Set(3, true);
+                        break;
+                    case DataType.ACCEPT_REQUEST:
+                        callbacks.Set(1, true);
                         break;
                 }
             }
@@ -175,7 +174,8 @@ public class UDPClient : MonoBehaviour
         if (!IPAddress.TryParse(field.text, out adress)) return;
 
         serverEndPoint = new IPEndPoint(adress, 5554);
-        cnct.Start();
+        if (!callbacks.Get(4)) cnct.Start();
+        else SendData(Encoding.ASCII.GetBytes("Client"));
     }
 
     private void AddNewPlayer()

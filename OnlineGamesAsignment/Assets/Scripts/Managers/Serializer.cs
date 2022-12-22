@@ -9,7 +9,8 @@ public enum DataType
     INPUT_FLAG,
     WORLD_CHECK,
     LOBBY_MAX,
-    NEXT_LEVEL
+    NEXT_LEVEL,
+    ACCEPT_REQUEST
 }
 
 public static class Serializer
