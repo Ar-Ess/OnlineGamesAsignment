@@ -34,6 +34,12 @@ public class PlayerMovement : MonoBehaviour
     private Vector2? worldCheckVector = null;
     private Vector2 spawn = new Vector2(0.0f,0.0f);
     private HealthBar healthBar;
+    [SerializeField] private float attackRange = 0.13f;
+    [SerializeField] private int damage = 5;
+
+    // Public
+    public Transform attackPoint;
+    public LayerMask enemyLayers;
 
     private void Awake()
     {
@@ -112,6 +118,29 @@ public class PlayerMovement : MonoBehaviour
         }
 
         rb.velocity = velocity;
+
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            Attack();
+        }
+    }
+
+    private void Attack()
+    {
+
+        anim.SetTrigger("Attack");
+        Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position,attackRange,enemyLayers);
+
+        foreach(Collider enemy in hitEnemies)
+        {
+            enemy.GetComponent<EnemyLogic>().TakeDamage(damage);
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (attackPoint == null) return;
+        Gizmos.DrawSphere(attackPoint.position, attackRange);
     }
 
     private void Jump(StreamFlag frameFlag)

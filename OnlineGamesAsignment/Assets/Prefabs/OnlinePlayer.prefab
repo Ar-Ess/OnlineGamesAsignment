@@ -148,6 +148,7 @@ MonoBehaviour:
   speed: 7
   jumpForce: 6
   wCFreedomDegree: 1
+  healthBarInstance: {fileID: 7657245726311896329, guid: 88db55f59fee3d74a9152ff1c455dedc, type: 3}
 --- !u!65 &7004509489716133470
 BoxCollider:
   m_ObjectHideFlags: 0

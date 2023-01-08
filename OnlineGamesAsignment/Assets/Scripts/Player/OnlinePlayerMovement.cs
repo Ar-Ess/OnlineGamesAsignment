@@ -11,6 +11,8 @@ public class OnlinePlayerMovement : MonoBehaviour
     [SerializeField] float jumpForce = 0;
     [Header("World Check")]
     [SerializeField] int wCFreedomDegree = 1;
+    [Header("Health")]
+    [SerializeField] private GameObject healthBarInstance = null;
 
     // Private
     private StreamFlag flag = new StreamFlag(0);
@@ -20,6 +22,7 @@ public class OnlinePlayerMovement : MonoBehaviour
     private SpriteRenderer sprite;
     private Animator anim;
     private Vector2? receivePosition = null;
+    private HealthBar healthBar;
 
     private void Start()
     {
@@ -27,6 +30,9 @@ public class OnlinePlayerMovement : MonoBehaviour
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
         playerCollider = GetComponent<Collider>();
+
+        GameObject healthBarObject = Instantiate(healthBarInstance);
+        healthBar = healthBarObject.GetComponent<HealthBar>();
     }
 
     private void Update()
