@@ -101,7 +101,6 @@ public class UDPServer : MonoBehaviour
 
     private void AddNewClient(EndPoint point)
     {
-        SendData(Serializer.Serialize(DataType.ACCEPT_REQUEST), point);
         clients.Add(new OnlinePlayer((IPEndPoint)point));
         callbacks.Set(0, true);
     }
