@@ -16,7 +16,7 @@ public class BossBehavior : MonoBehaviour
 
     // Private variables
     private float lastAttackTime;
-    private Rigidbody2D rb;
+    private Rigidbody rb;
     private Animator anim;
     private GameObject player;
     private bool isAttacking;
@@ -24,7 +24,7 @@ public class BossBehavior : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         
     }
