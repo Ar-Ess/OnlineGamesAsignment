@@ -22,11 +22,17 @@ public class EnemyLogic : MonoBehaviour
     [Header("Oscillate Config")]
     [SerializeField] private Vector2 amplitude = new Vector2(0.0f, 0.0f);
 
+    [Header("Enemy stats")]
+    public int maxHealth = 20;
+    
+
+
     // Private
     private SpriteRenderer sprite;
     private Vector2 topRightLimit = new Vector2(0, 0);
     private Vector2 bottomLeftLimit = new Vector2(0, 0);
     private bool moveForward = false;
+    private int currentHealth;
 
     private void Awake()
     {
@@ -35,6 +41,7 @@ public class EnemyLogic : MonoBehaviour
         bottomLeftLimit = new Vector2(transform.position.x - amplitude.x, transform.position.y - amplitude.y);
         sprite.flipX = (velocity.x < 0);
         moveForward = !startOnTriggerEnter;
+        currentHealth = maxHealth;
     }
 
     // Update is called once per frame
@@ -91,7 +98,7 @@ public class EnemyLogic : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag.Equals("Death"))
-            Destroy(this);
+            Death();
 
         if (other.tag.Equals("Ground")) return;
 
@@ -99,5 +106,19 @@ public class EnemyLogic : MonoBehaviour
         {
             moveForward = true;
         }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        if(currentHealth <= 0)
+        {
+            Death();
+        }
+    }
+
+    private void Death()
+    {
+        Destroy(this.gameObject);
     }
 }
