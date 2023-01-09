@@ -11,7 +11,8 @@ public enum DataType
     LOBBY_MAX,
     NEXT_LEVEL,
     JOIN_REQUEST,
-    ACCEPT_REQUEST
+    ACCEPT_REQUEST,
+    PLAYER_HEALTH,
 }
 
 public static class Serializer
@@ -55,6 +56,14 @@ public static class Serializer
             BinaryReader reader = new BinaryReader(stream);
             stream.Seek(4, SeekOrigin.Begin);
             uint rcvUint = reader.ReadUInt16();
+            return rcvUint;
+        }
+
+        public int Int()
+        {
+            BinaryReader reader = new BinaryReader(stream);
+            stream.Seek(4, SeekOrigin.Begin);
+            int rcvUint = reader.ReadInt32();
             return rcvUint;
         }
 

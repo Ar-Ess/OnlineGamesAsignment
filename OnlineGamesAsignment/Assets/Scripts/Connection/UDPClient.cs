@@ -25,6 +25,7 @@ public class UDPClient : MonoBehaviour
     // BuildPlayer (0) | JoinServer (1) | CreateNewPlayer (2) | GoNextLevel(3) | ThreadStarted(4)
     private StreamFlag callbacks = new StreamFlag(0);
     private uint currentLevel = 0;
+    private int threadHealth = -1;
 
     private void Awake()
     {
@@ -39,12 +40,22 @@ public class UDPClient : MonoBehaviour
 
     private void Update()
     {
+        UpdateHealthLevels(); // Updatejar fora the thread les healths
         AddPlayerLogic(); // Ha d'estar justament aquí. A sobre de tot. No moure.
 
         JoinServerLogic();
         LookForLocalPlayerInstance(); //TODO: Only in lobby
         BuildPlayers();
         GoNextLevel();
+    }
+
+    private void UpdateHealthLevels()
+    {
+        if (threadHealth != -1)
+        {
+            player.health = threadHealth;
+            threadHealth = -1;
+        }
     }
 
     private void GoNextLevel()
@@ -98,15 +109,20 @@ public class UDPClient : MonoBehaviour
     private void ConnectClient()
     {
         clientSocket.Connect(serverEndPoint);
-
         if (!clientSocket.Connected) return;
+
+        if (!SendData(Serializer.Serialize(DataType.JOIN_REQUEST)))
+        {
+            clientSocket.Disconnect(true);
+            return;
+        }
 
         if (callbacks.Get(4)) return;
         callbacks.Set(4, true);
-        rcv.Start();
-        snd.Start();
-    }
 
+        snd.Start();
+        rcv.Start();
+    }
 
     private void Receive()
     {
@@ -115,10 +131,8 @@ public class UDPClient : MonoBehaviour
             byte[] buffer = new byte[1024];
             clientSocket.ReceiveFrom(buffer, ref serverEndPoint);
             MemoryStream recvStream = new MemoryStream(buffer);
-
  
             DataType type = Serializer.CheckDataType(recvStream);
-            //if (type != DataType.INPUT_FLAG) Debug.Log(type.ToString());
             switch (type)
             {
                 case DataType.INPUT_FLAG:
@@ -140,8 +154,10 @@ public class UDPClient : MonoBehaviour
                 case DataType.ACCEPT_REQUEST:
                     callbacks.Set(1, true);
                     break;
+                case DataType.PLAYER_HEALTH:
+                    threadHealth = Serializer.Deserialize(recvStream).Int();
+                    break;
             }
-
 
             recvStream.Flush();
             recvStream.Dispose();
@@ -165,6 +181,12 @@ public class UDPClient : MonoBehaviour
                 SendData(Serializer.Serialize(localPlayer.WorldCheck));
                 localPlayer.ClearWorldCheckVector();
             }
+
+            if (localPlayer.NeedUpdateHealth)
+            {
+                SendData(Serializer.Serialize((uint)localPlayer.health, DataType.PLAYER_HEALTH));
+                localPlayer.NeedUpdateHealth = false;
+            }
         }
     }
 
@@ -180,8 +202,6 @@ public class UDPClient : MonoBehaviour
             cnct = new Thread(new ThreadStart(ConnectClient));
             cnct.Start();
         }
-
-        SendData(Serializer.Serialize(DataType.JOIN_REQUEST));
     }
 
     private void AddNewPlayer()
@@ -198,8 +218,19 @@ public class UDPClient : MonoBehaviour
         clientSocket.Close();
     }
 
-    private void SendData(byte[] data)
+    private bool SendData(byte[] data)
     {
-        clientSocket.SendTo(data, serverEndPoint);
+        bool ret = true;
+        try
+        {
+            clientSocket.SendTo(data, serverEndPoint);
+        }
+        catch
+        {
+            ret = false;
+        }
+
+        return ret;
     }
+
 }

@@ -153,6 +153,16 @@ public class UDPServer : MonoBehaviour
                 }
                 localPlayer.ClearWorldCheckVector();
             }
+
+            if (localPlayer.NeedUpdateHealth)
+            {
+                foreach (OnlinePlayer player in clients)
+                {
+                    if (!player.built) continue;
+                    SendData(Serializer.Serialize((uint)localPlayer.health, DataType.PLAYER_HEALTH), player.ep);
+                }
+                localPlayer.NeedUpdateHealth = false;
+            }
         }
     }
 
@@ -176,6 +186,9 @@ public class UDPServer : MonoBehaviour
                         break;
                     case DataType.WORLD_CHECK:
                         player.movement.SetPosition(Serializer.Deserialize(recvStream).Vector2());
+                        break;
+                    case DataType.PLAYER_HEALTH:
+                        player.health = Serializer.Deserialize(recvStream).Int();
                         break;
                 }
                 recvStream.Flush();

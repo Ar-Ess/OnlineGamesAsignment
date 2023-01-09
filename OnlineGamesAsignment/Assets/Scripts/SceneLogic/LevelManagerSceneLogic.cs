@@ -9,5 +9,6 @@ public class LevelManagerSceneLogic : MonoBehaviour
     void Start()
     {
         Instantiate(localPlayer);
+        GameObject.FindGameObjectWithTag("OnlinePLayer").GetComponentInChildren<OnlinePlayerMovement>().InstantiateHealthBar();
     }
 }

@@ -14,6 +14,12 @@ public class HealthBar : MonoBehaviour
         Debug.Log(name + transform.position);
     }
 
+    public void UpdateOnlineHealth(int health)
+    {
+        this.health = health;
+        UpdateHealth();
+    }
+
     public void SetHealthBar(int maxHealth)
     {
         health = maxHealth;

@@ -12,7 +12,10 @@ public class OnlinePlayerMovement : MonoBehaviour
     [Header("World Check")]
     [SerializeField] int wCFreedomDegree = 1;
     [Header("Health")]
-    [SerializeField] private GameObject healthBarInstance = null;
+    [SerializeField] public GameObject healthBarInstance = null;
+    [SerializeField] private int maxHealth = 5;
+
+    public HealthBar onlineHealth { get { return healthBar; } }
 
     // Private
     private StreamFlag flag = new StreamFlag(0);
@@ -114,5 +117,13 @@ public class OnlinePlayerMovement : MonoBehaviour
     public void SetPosition(Vector2 vector2)
     {
         receivePosition = vector2;
+    }
+
+    public void InstantiateHealthBar()
+    {
+        GameObject healthBarObject = Instantiate(healthBarInstance);
+        healthBarObject.transform.SetParent(GameObject.Find("Canvas").transform);
+        healthBar = healthBarObject.GetComponent<HealthBar>();
+        healthBar.SetHealthBar(maxHealth);
     }
 }

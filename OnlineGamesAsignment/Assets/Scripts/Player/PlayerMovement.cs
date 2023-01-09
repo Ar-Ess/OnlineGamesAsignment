@@ -15,16 +15,25 @@ public class PlayerMovement : MonoBehaviour
     [Header("Health")]
     [SerializeField] private GameObject healthBarInstance = null;
     [SerializeField] private int maxHealth = 5;
+    [Header("Attack")]
+    [SerializeField] private float attackRange = 0.13f;
+    [SerializeField] private int damage = 5;
+    public Transform attackPoint;
+    public LayerMask enemyLayers;
 
     // Accessors
     public uint Flag { get { return flag.flag; } }
     public bool IsAnyInputActive { get { return flag.IsAnyTrue(); } }
     public Vector2 WorldCheck { get { return worldCheckVector.GetValueOrDefault(); } }
     public bool IsSendWorldCheck { get { return (worldCheckVector != null); } }
-    public int health { get { return healthBar.health; } }
+    public int health { get { return healthBar.health; } set { healthBar.health = value; } }
+
+    public bool NeedUpdateHealth { get { return states.Get(0); } set { states.Set(0, value); } }
 
     // Private
     private StreamFlag flag = new StreamFlag(0);
+    // UpdateHealth(0)
+    private StreamFlag states = new StreamFlag(0);
     private bool ground = false;
     private Rigidbody rb;
     private Collider playerCollider;
@@ -34,12 +43,6 @@ public class PlayerMovement : MonoBehaviour
     private Vector2? worldCheckVector = null;
     private Vector2 spawn = new Vector2(0.0f,0.0f);
     private HealthBar healthBar;
-    [SerializeField] private float attackRange = 0.13f;
-    [SerializeField] private int damage = 5;
-
-    // Public
-    public Transform attackPoint;
-    public LayerMask enemyLayers;
 
     private void Awake()
     {
@@ -195,6 +198,8 @@ public class PlayerMovement : MonoBehaviour
     {
         Debug.Log("Hit");
         if (healthBar.Damage(1)) Death();
+        // Update health
+        NeedUpdateHealth = true;
     }
 
     private void OnTriggerEnter(Collider other)

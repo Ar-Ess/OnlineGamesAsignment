@@ -3,6 +3,8 @@ using System.Net;
 
 class OnlinePlayer
 {
+    public int health { get { return movement.onlineHealth.health; } set { movement.onlineHealth.UpdateOnlineHealth(value); } }
+
     public OnlinePlayer(IPEndPoint ep, bool server = false)
     {
         this.ep = ep;
