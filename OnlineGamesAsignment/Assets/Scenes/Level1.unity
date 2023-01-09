@@ -23788,13 +23788,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2065594814}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63f9697a938637c449a9e12c3b5abaa5, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b9738f3c7338ba44be63a249a4cac53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   localPlayer: {fileID: 6823275868626177215, guid: 937129c9e72651d47a4ae967463967c1, type: 3}
-  numPlayersText: {fileID: 0}
-  maxPlayersText: {fileID: 0}
-  joinText: {fileID: 0}
 --- !u!4 &2065594816
 Transform:
   m_ObjectHideFlags: 0
