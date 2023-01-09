@@ -103,6 +103,7 @@ public class UDPServer : MonoBehaviour
     {
         clients.Add(new OnlinePlayer((IPEndPoint)point));
         callbacks.Set(0, true);
+        SendData(Serializer.Serialize(DataType.ACCEPT_REQUEST), point);
     }
 
     private void Send()

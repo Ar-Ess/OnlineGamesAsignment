@@ -12,17 +12,17 @@ public class UDPClient : MonoBehaviour
     [SerializeField] private GameObject onlinePlayer = null;
     public UDPClient Instance { get { return _instance; } }
     public uint MaxLobbyPlayers { get { return maxLobbyPlayers; } }
-    public uint NumLobbyPlayers { get { return (uint)players.Count + 1; } }
+    public uint NumLobbyPlayers { get { return 2; } }
 
     // Private
     private Socket clientSocket;
     private Thread cnct, snd, rcv;
     private uint maxLobbyPlayers = 1;
     private PlayerMovement localPlayer = null;
-    private List<OnlinePlayer> players = new List<OnlinePlayer>();
+    private OnlinePlayer player = null;
     private UDPClient _instance;
     private EndPoint serverEndPoint = null;
-    // BuildPlayer (0) | JoinServer (1) | CreateNewPlayer (2) | GoNextLevel(3)
+    // BuildPlayer (0) | JoinServer (1) | CreateNewPlayer (2) | GoNextLevel(3) | ThreadStarted(4)
     private StreamFlag callbacks = new StreamFlag(0);
     private uint currentLevel = 0;
 
@@ -33,7 +33,6 @@ public class UDPClient : MonoBehaviour
         DontDestroyOnLoad(this);
 
         clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        cnct = new Thread(new ThreadStart(ConnectClient));
         rcv = new Thread(new ThreadStart(Receive));
         snd = new Thread(new ThreadStart(Send));
     }
@@ -61,7 +60,7 @@ public class UDPClient : MonoBehaviour
         if (!callbacks.Get(2)) return;
         callbacks.Set(2, false);
 
-        players.Add(new OnlinePlayer((IPEndPoint)serverEndPoint, players.Count == 0));
+        player = new OnlinePlayer((IPEndPoint)serverEndPoint, false);
         callbacks.Set(0, true);
     }
 
@@ -87,14 +86,13 @@ public class UDPClient : MonoBehaviour
         if (!callbacks.Get(0)) return;
         callbacks.Set(0, false);
 
-        foreach (OnlinePlayer player in players)
+
+        if (!player.built)
         {
-            if (!player.built)
-            {
-                player.BuildOnlinePlayer(Instantiate(onlinePlayer));
-                DontDestroyOnLoad(player.player);
-            }
+            player.BuildOnlinePlayer(Instantiate(onlinePlayer));
+            DontDestroyOnLoad(player.player);
         }
+
     }
 
     private void ConnectClient()
@@ -103,16 +101,12 @@ public class UDPClient : MonoBehaviour
 
         if (!clientSocket.Connected) return;
 
-
-
-        // JoinServer
-        callbacks.Set(1, true);
-
-        byte[] data = Encoding.ASCII.GetBytes("Client");
-        clientSocket.Send(data, data.Length, SocketFlags.None);
+        if (callbacks.Get(4)) return;
+        callbacks.Set(4, true);
         rcv.Start();
         snd.Start();
     }
+
 
     private void Receive()
     {
@@ -122,27 +116,32 @@ public class UDPClient : MonoBehaviour
             clientSocket.ReceiveFrom(buffer, ref serverEndPoint);
             MemoryStream recvStream = new MemoryStream(buffer);
 
-            foreach (OnlinePlayer player in players)
+ 
+            DataType type = Serializer.CheckDataType(recvStream);
+            //if (type != DataType.INPUT_FLAG) Debug.Log(type.ToString());
+            switch (type)
             {
-                if (!player.built) continue;
-                DataType type = Serializer.CheckDataType(recvStream);
-                //if (type != DataType.INPUT_FLAG) Debug.Log(type.ToString());
-                switch (type)
-                {
-                    case DataType.INPUT_FLAG:
-                        player.movement.SetFlag(Serializer.Deserialize(recvStream).Uint());
-                        break;
-                    case DataType.WORLD_CHECK:
-                        player.movement.SetPosition(Serializer.Deserialize(recvStream).Vector2());
-                        break;
-                    case DataType.LOBBY_MAX:
-                        maxLobbyPlayers = Serializer.Deserialize(recvStream).Uint();
-                        break;
-                    case DataType.NEXT_LEVEL:
-                        callbacks.Set(3, true);
-                        break;
-                }
+                case DataType.INPUT_FLAG:
+                    if (!player.built) break;
+                    player.movement.SetFlag(Serializer.Deserialize(recvStream).Uint());
+                    break;
+                case DataType.WORLD_CHECK:
+                    if (!player.built) break;
+                    player.movement.SetPosition(Serializer.Deserialize(recvStream).Vector2());
+                    break;
+                case DataType.LOBBY_MAX:
+                    if (!player.built) break;
+                    maxLobbyPlayers = Serializer.Deserialize(recvStream).Uint();
+                    break;
+                case DataType.NEXT_LEVEL:
+                    if (!player.built) break;
+                    callbacks.Set(3, true);
+                    break;
+                case DataType.ACCEPT_REQUEST:
+                    callbacks.Set(1, true);
+                    break;
             }
+
 
             recvStream.Flush();
             recvStream.Dispose();
@@ -175,7 +174,14 @@ public class UDPClient : MonoBehaviour
         if (!IPAddress.TryParse(field.text, out adress)) return;
 
         serverEndPoint = new IPEndPoint(adress, 5554);
-        cnct.Start();
+
+        if(!clientSocket.Connected)
+        {
+            cnct = new Thread(new ThreadStart(ConnectClient));
+            cnct.Start();
+        }
+
+        SendData(Serializer.Serialize(DataType.JOIN_REQUEST));
     }
 
     private void AddNewPlayer()
